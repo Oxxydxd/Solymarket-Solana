@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solymarket - Market</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,600,700&display=swap">
+  <style>
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: linear-gradient(135deg, #0b0b0f 0%, #111217 100%);
+      color: #e6eef8;
+      margin: 0;
+      padding: 0;
+    }
+    .primary {
+      color: #9aff00;
+    }
+    .accent {
+      color: #7acc00;
+    }
+    .danger {
+      color: #ff6b6b;
+    }
+    .surface {
+      background: linear-gradient(180deg, rgba(55,65,81,0.4), rgba(31,41,55,0.6));
+    }
+    .btn {
+      background: linear-gradient(90deg, #9aff00, #7acc00);
+      color: #041;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(154,255,0,0.07);
+      transition: background 0.2s, color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+    .btn:hover {
+      background: linear-gradient(90deg, #baff33, #9aff00);
+      color: #041;
+      box-shadow: 0 0 12px 0 rgba(154,255,0,0.18);
+      transform: translateY(-1px) scale(1.03);
+    }
+    .btn.secondary {
+      background: rgba(255,255,255,0.05);
+      color: #bcd3e6;
+      border: 1.5px solid rgba(255,255,255,0.07);
+    }
+    .btn.danger, .btn.danger:hover {
+      background: linear-gradient(90deg, #ff6b6b, #dc2626);
+      color: #fff;
+      border: none;
+      box-shadow: 0 2px 8px rgba(255,107,107,0.13);
+    }
+    .badge-success {
+      background: rgba(154,255,0,0.08);
+      color: #9aff00;
+      border-radius: 6px;
+      padding: 2px 10px;
+      font-size: 0.95em;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .badge-pending {
+      background: rgba(245,158,11,0.1);
+      color: #f59e0b;
+      border-radius: 6px;
+      padding: 2px 10px;
+      font-size: 0.95em;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .border-accent {
+      border: 1.5px solid #9aff00;
+    }
+    .border-subtle {
+      border: 1.5px solid rgba(255,255,255,0.07);
+    }
+    .text-secondary {
+      color: #bcd3e6;
+    }
+    .text-warning {
+      color: #f59e0b;
+    }
+    .text-error {
+      color: #ff6b6b;
+    }
+    .text-title {
+      color: #f9fafb;
+    }
+    
+    /* Header Styles */
+    .header {
+      background: rgba(6, 6, 8, 0.55);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(154, 255, 0, 0.06);
+      padding: 16px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      color: #9aff00;
+      font-size: 20px;
+      text-decoration: none;
+    }
+
+    .brand .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #9aff00, #7acc00);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #041;
+      font-weight: 900;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav a {
+      padding: 10px 16px;
+      border-radius: 8px;
+      color: #d1d5db;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .nav a.active, .nav a:hover {
+      color: #9aff00;
+      background: rgba(154, 255, 0, 0.04);
+    }
+
+    .nav a.admin {
+      background: rgba(255, 107, 107, 0.1);
+      color: #ff6b6b;
+      border: 1px solid rgba(255, 107, 107, 0.2);
+    }
+
+    .wallet-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .balance {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 13px;
+      font-weight: 600;
+      color: #cfeccf;
+    }
+
+    .wallet-btn {
+      background: linear-gradient(90deg, #9aff00, #7acc00);
+      color: #041;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .wallet-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .wallet-btn.connected {
+      background: transparent;
+      border: 1px solid #9aff00;
+      color: #9aff00;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="brand">
+        <div class="logo">S</div>
+        <span>Solymarket</span>
+      </a>
+      <nav class="nav">
+  <a href="index.html" class="nav-link">Markets</a>
+  <a href="index.html" class="nav-link" id="myBetsNavLink">My Bets</a>
+        <a href="index.html" class="nav-link">Treasury</a>
+        <a href="index.html" class="nav-link">How It Works</a>
+        <a href="index.html" id="adminTab" class="nav-link admin" style="display:none">Admin Panel</a>
+      </nav>
+      <div class="wallet-group">
+        <div class="balance" id="balanceDisplay" style="display:none;">
+          SOL: <span id="solBalance">0.000</span>
+        </div>
+        <button id="walletBtn" class="btn wallet-btn">Connect Wallet</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="marketSection" style="max-width:1200px;margin:40px auto 0 auto;padding:40px 36px 48px 36px;background:linear-gradient(180deg, rgba(55,65,81,0.4), rgba(31,41,55,0.6));border-radius:22px;box-shadow:0 4px 40px rgba(0,0,0,0.13);">
+      <div id="marketInfo">
+        <h2 id="marketTitle" class="primary" style="margin-bottom:8px;font-size:2rem;font-weight:800;"></h2>
+        <div id="marketMeta" style="color:#9ca3af;font-size:1rem;margin-bottom:8px;"></div>
+        <div id="marketVolume" style="color:#f59e0b;font-size:1.08rem;font-weight:700;margin-bottom:8px;"></div>
+        <div id="marketOptions" style="display:flex;gap:18px;margin-bottom:32px;"></div>
+        <div id="totalBuys" style="color:#10b981;font-size:1.1rem;font-weight:600;margin-bottom:18px;"></div>
+      </div>
+      
+      <div style="margin-bottom:32px;">
+        <div style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap; width: 100%;">
+          <div style="flex: 2.5; min-width: 420px; background: #181e29; border-radius: 18px; padding: 32px 24px 32px 24px; box-shadow: 0 2px 24px rgba(16,185,129,0.09);">
+            <canvas id="marketChart" height="180"></canvas>
+          </div>
+          
+          <div class="trade-card" style="background:#151926;border:1.5px solid #23263a;border-radius:18px;box-shadow:0 4px 32px rgba(16,185,129,0.09);padding:36px 32px 28px 32px;max-width:440px;width:100%;min-width:340px;margin-top:0;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+              <div id="tradeOptionName" style="color:#9aff00;font-weight:800;font-size:1.15rem;display:flex;align-items:center;gap:8px;"></div>
+            </div>
+            <div id="tradeOdds" style="color:#f59e0b;font-size:1.05rem;margin-bottom:10px;font-weight:600;"></div>
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+              <button class="btn quick-btn" type="button" style="flex:1;min-width:0;background:#23263a;color:#9aff00;border:1.5px solid #9aff00;" onclick="document.getElementById('tradeAmount').value=0.1;calculateProfit();">0.1</button>
+              <button class="btn quick-btn" type="button" style="flex:1;min-width:0;background:#23263a;color:#9aff00;border:1.5px solid #9aff00;" onclick="document.getElementById('tradeAmount').value=0.5;calculateProfit();">0.5</button>
+              <button class="btn quick-btn" type="button" style="flex:1;min-width:0;background:#23263a;color:#9aff00;border:1.5px solid #9aff00;" onclick="document.getElementById('tradeAmount').value=1;calculateProfit();">1</button>
+              <button class="btn quick-btn" type="button" style="flex:1;min-width:0;background:#23263a;color:#7acc00;border:1.5px solid #7acc00;" onclick="if(window.solBalance){document.getElementById('tradeAmount').value=window.solBalance.toFixed(2);calculateProfit();}" title="Max">Max</button>
+            </div>
+            <input id="tradeAmount" type="number" min="0.01" step="0.01" placeholder="Amount (SOL)" style="width:100%;padding:16px 14px;border-radius:10px;border:2px solid #7acc00;background:#181e29;color:#f3f4f6;font-size:1.2rem;margin-bottom:10px;outline:none;box-shadow:none;">
+            <div id="profitCalc" style="color:#10b981;font-size:1.08rem;margin-bottom:14px;font-weight:600;background:rgba(16,185,129,0.07);padding:8px 10px;border-radius:8px;"></div>
+            <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">
+              <button id="buyBtn" class="btn" style="flex:1;width:100%;font-size:1.08rem;padding:13px 0;box-shadow:0 2px 8px rgba(154,255,0,0.07);">Buy</button>
+            </div>
+            <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">
+              <button id="cancelBtn" class="btn" style="flex:1;width:100%;background:#ef4444;color:#fff;font-size:1.08rem;padding:13px 0;box-shadow:0 2px 8px rgba(239,68,68,0.13);border:1.5px solid #ef4444;">Cancel Purchase</button>
+            </div>
+            <hr style="border:none;border-top:1px solid #23263a;margin:12px 0 10px 0;">
+            <div id="tradeMsg" style="margin-top:0;color:#10b981;font-size:1.05rem;min-height:22px;"></div>
+          </div>
+        </div>
+        <div id="orderBook" style="margin-top:32px;"></div>
+      </div>
+      
+      <!-- Comment Section -->
+      <section id="commentSection" style="margin-top:40px;background:#181e29;border-radius:16px;padding:28px 24px 18px 24px;box-shadow:0 2px 16px rgba(16,185,129,0.07);max-width:700px;margin-left:auto;margin-right:auto;">
+        <h3 style="color:#9aff00;margin-bottom:10px;font-size:1.25rem;font-weight:700;">Comments</h3>
+        <div id="commentsList" style="margin-bottom:18px;"></div>
+        <div id="commentBoxContainer" style="display:none;">
+          <textarea id="commentInput" rows="3" maxlength="300" placeholder="Write a comment..." style="width:100%;padding:12px 10px;border-radius:8px;border:1.5px solid #7acc00;background:#151926;color:#e6eef8;font-size:1.08rem;resize:vertical;margin-bottom:8px;"></textarea>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <span id="commentWarning" style="color:#f59e0b;font-size:0.98rem;">Do not click any links beware of scammers.</span>
+            <button id="postCommentBtn" class="btn" style="padding:8px 18px;font-size:1rem;">Post</button>
+          </div>
+          <div id="commentMsg" style="color:#ff6b6b;font-size:0.98rem;margin-top:6px;min-height:18px;"></div>
+        </div>
+        <div id="commentLoginMsg" style="color:#bcd3e6;font-size:1.05rem;margin-top:8px;"></div>
+      </section>
+    </section>
+
+    <!-- My Bets Section -->
+    <section id="mybetsSection" style="display:none;max-width:900px;margin:40px auto 0 auto;padding:32px 24px 40px 24px;background:linear-gradient(180deg, rgba(55,65,81,0.4), rgba(31,41,55,0.6));border-radius:18px;box-shadow:0 4px 32px rgba(0,0,0,0.10);">
+      <div class="section-header">
+        <h2 class="section-title">My Betting History</h2>
+      </div>
+      <div id="betsContainer">
+        <div class="empty-state">
+          <h3>Connect Wallet</h3>
+          <p>Connect your wallet to view your betting history.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Buffer polyfill for Solana web3.js -->
+  <script>
+    (function() {
+      'use strict';
+      
+      function base64ToBytes(base64) {
+        const binString = atob(base64);
+        return Uint8Array.from(binString, (m) => m.codePointAt(0));
+      }
+      
+      function bytesToBase64(bytes) {
+        const binString = Array.from(bytes, (byte) => String.fromCodePoint(byte)).join("");
+        return btoa(binString);
+      }
+      
+      function BufferPolyfill(arrayBuffer, byteOffset, length) {
+        if (arrayBuffer instanceof ArrayBuffer) {
+          return new Uint8Array(arrayBuffer, byteOffset, length);
+        } else if (Array.isArray(arrayBuffer)) {
+          return new Uint8Array(arrayBuffer);
+        } else if (arrayBuffer instanceof Uint8Array) {
+          return arrayBuffer;
+        }
+        return new Uint8Array(arrayBuffer || 0);
+      }
+      
+      BufferPolyfill.from = function(data, encoding) {
+        if (typeof data === 'string') {
+          if (encoding === 'base64') {
+            return base64ToBytes(data);
+          } else if (encoding === 'hex') {
+            const bytes = [];
+            for (let i = 0; i < data.length; i += 2) {
+              bytes.push(parseInt(data.substr(i, 2), 16));
+            }
+            return new Uint8Array(bytes);
+          } else {
+            return new TextEncoder().encode(data);
+          }
+        } else if (data instanceof ArrayBuffer) {
+          return new Uint8Array(data);
+        } else if (Array.isArray(data) || data instanceof Uint8Array) {
+          return new Uint8Array(data);
+        }
+        return new Uint8Array();
+      };
+      
+      BufferPolyfill.alloc = function(size, fill) {
+        const buf = new Uint8Array(size);
+        if (fill !== undefined) {
+          buf.fill(fill);
+        }
+        return buf;
+      };
+      
+      BufferPolyfill.allocUnsafe = function(size) {
+        return new Uint8Array(size);
+      };
+      
+      BufferPolyfill.concat = function(buffers, totalLength) {
+        if (totalLength === undefined) {
+          totalLength = buffers.reduce((len, buf) => len + buf.length, 0);
+        }
+        const result = new Uint8Array(totalLength);
+        let offset = 0;
+        for (const buf of buffers) {
+          result.set(buf, offset);
+          offset += buf.length;
+        }
+        return result;
+      };
+      
+      BufferPolyfill.isBuffer = function(obj) {
+        return obj instanceof Uint8Array;
+      };
+      
+      window.Buffer = BufferPolyfill;
+    })();
+  </script>
+  
+  <!-- Use a specific stable version for better compatibility -->
+  <script src="https://unpkg.com/@solana/web3.js@1.75.0/lib/index.iife.min.js"></script>
+  <!-- Loading Screen Overlay -->
+  <div id="loadingScreen" style="position:fixed;inset:0;background:#0b0b0f;display:flex;align-items:center;justify-content:center;z-index:9999;">
+    <div style="text-align:center;color:#9aff00;">
+      <div style="width:50px;height:50px;border:4px solid rgba(154,255,0,0.3);border-top-color:#9aff00;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
+      <div style="font-size:18px;font-weight:700;">Loading Solymarket...</div>
+    </div>
+  </div>
+  <style>@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}</style>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        document.getElementById('loadingScreen').style.display = 'none';
+      }, 1000);
+    });
+  </script>
+  
+  <script>
+    // API BASE URL LOGIC
+    const API_BASE_URL = (function() {
+      const { hostname } = window.location;
+      if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:3001/api';
+      }
+      if (hostname.endsWith('onrender.com')) {
+        return `https://${hostname}/api`;
+      }
+      if (hostname === 'www.solymarket.cc') {
+        return 'https://www.solymarket.cc/api';
+      }
+      if (hostname === 'solymarket.cc') {
+        return 'https://solymarket.cc/api';
+      }
+      return window.location.origin + '/api';
+    })();
+
+    // Helius RPC endpoint
+    const RPC_ENDPOINTS = [
+      'https://mainnet.helius-rpc.com/?api-key=f2f75056-c535-4df0-84ff-d8eb55198b7c',
+      'https://api.mainnet-beta.solana.com',
+      'https://rpc.ankr.com/solana'
+    ];
+    
+    function getSolanaConnection() {
+      return new solanaWeb3.Connection(RPC_ENDPOINTS[0]);
+    }
+
+    // Globals
+    let wallet = null;
+    let walletPublicKey = null;
+    window.solBalance = 0;
+    let currentOrderBook = null;
+    let currentMarket = null;
+    let selectedOutcome = 0;
+    window.currentOrderBook = currentOrderBook;
+    window.currentMarket = currentMarket;
+    window.selectedOutcome = selectedOutcome;
+
+    // Wallet functions
+    async function updateBalance() {
+      if (!walletPublicKey) {
+        document.getElementById('balanceDisplay').style.display = 'none';
+        return;
+      }
+      try {
+        const conn = getSolanaConnection();
+        const bal = await conn.getBalance(walletPublicKey);
+        window.solBalance = bal / solanaWeb3.LAMPORTS_PER_SOL;
+        document.getElementById('solBalance').textContent = window.solBalance.toFixed(3);
+        document.getElementById('balanceDisplay').style.display = '';
+      } catch (e) {
+        document.getElementById('balanceDisplay').style.display = 'none';
+      }
+    }
+
+    function setWalletBtnConnected(addr) {
+      const btn = document.getElementById('walletBtn');
+      btn.textContent = addr.slice(0, 4) + '...' + addr.slice(-4);
+      btn.classList.add('connected');
+    }
+    
+    function setWalletBtnDisconnected() {
+      const btn = document.getElementById('walletBtn');
+      btn.textContent = 'Connect Wallet';
+      btn.classList.remove('connected');
+    }
+
+    async function connectWallet() {
+      if (!window.solana || !window.solana.isPhantom) {
+        alert('Phantom wallet not found!');
+        return;
+      }
+      try {
+        const resp = await window.solana.connect();
+        wallet = window.solana;
+        walletPublicKey = resp.publicKey;
+        setWalletBtnConnected(resp.publicKey.toString());
+        await updateBalance();
+        updateAdminTabVisibility();
+      } catch (e) {
+        setWalletBtnDisconnected();
+      }
+    }
+
+    function disconnectWallet() {
+      wallet = null;
+      walletPublicKey = null;
+      setWalletBtnDisconnected();
+      document.getElementById('balanceDisplay').style.display = 'none';
+    }
+
+    function updateAdminTabVisibility() {
+      const adminTab = document.getElementById('adminTab');
+      const ADMIN_WALLET = 'DkoKjWfXRc7frJkQoVC1xL76BUBTzgmTRzm5KaQbRAyd';
+      if (walletPublicKey && walletPublicKey.toString() === ADMIN_WALLET) {
+        if (adminTab) adminTab.style.display = '';
+      } else {
+        if (adminTab) adminTab.style.display = 'none';
+      }
+    }
+
+    // Utility
+    function getMarketId() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      return id ? parseInt(id) : null;
+    }
+    
+    async function fetchMarketData(marketId) {
+      const res = await fetch(`${API_BASE_URL}/markets/${marketId}`);
+      if (!res.ok) throw new Error('Failed to fetch market');
+      return (await res.json()).market;
+    }
+    
+    async function fetchOrderBook(marketId) {
+      const res = await fetch(`${API_BASE_URL}/orderbook/${marketId}`);
+      if (!res.ok) throw new Error('Failed to fetch order book');
+      return (await res.json()).orderBook;
+    }
+
+    // UI Rendering
+    async function renderMarketInfo(market) {
+      document.getElementById('marketTitle').textContent = market.title;
+      document.getElementById('marketMeta').textContent = `Category: ${market.category} | Created: ${new Date(market.created_at).toLocaleString()}`;
+      
+      let totalVolume = 0;
+      try {
+        const res = await fetch(`${API_BASE_URL}/bets?marketId=${market.id}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.bets)) {
+            totalVolume = data.bets.reduce((sum, b) => sum + (parseFloat(b.amount) || 0), 0);
+          }
+        }
+      } catch (e) {
+        if (window.currentOrderBook && Array.isArray(window.currentOrderBook)) {
+          totalVolume = window.currentOrderBook.reduce((sum, b) => sum + (parseFloat(b.amount) || 0), 0);
+        }
+      }
+      
+      document.getElementById('marketVolume').innerHTML = `Total Volume: <span style='color:#10b981;'>${totalVolume.toFixed(3)} SOL</span>`;
+      
+      const optionsDiv = document.getElementById('marketOptions');
+      optionsDiv.innerHTML = '';
+      (market.options || []).forEach((opt, i) => {
+        const el = document.createElement('div');
+        el.className = 'option-tab' + (i===selectedOutcome?' active':'');
+        el.style = 'background:#23263a;padding:10px 10px 4px 10px;border-radius:10px;min-width:80px;text-align:center;cursor:pointer;border:2px solid '+(i===selectedOutcome?'#9aff00':'#23263a')+';transition:border 0.2s;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+        // Show admin odds if available
+        let oddsDisplay = '';
+        if (market.metadata && Array.isArray(market.metadata.admin_odds) && market.metadata.admin_odds[i]) {
+          oddsDisplay = `<div style='color:#f59e0b;font-size:0.98em;font-weight:600;margin-top:2px;'>x${parseFloat(market.metadata.admin_odds[i]).toFixed(2)}</div>`;
+        }
+        el.innerHTML = `
+          ${opt.image ? `<img src='${opt.image}' alt='' style='width:38px;height:38px;border-radius:50%;margin-bottom:6px;'>` : ''}
+          <div style="font-size:1.05rem;font-weight:700;color:#9aff00;">${opt.name || 'Option ' + (i+1)}</div>
+          ${oddsDisplay}
+        `;
+        el.onclick = ()=>{
+          selectedOutcome = i;
+          renderMarketInfo(market);
+          renderChart(market, currentOrderBook);
+          renderOrderBookPro(currentOrderBook, market, selectedOutcome);
+          updateTradePanel();
+          calculateProfit();
+        };
+        optionsDiv.appendChild(el);
+      });
+      
+      if (currentOrderBook && market.options) {
+        let html = '<span style="color:#9ca3af;">Total Buys:</span> ';
+        const totals = Array(market.options.length).fill(0);
+        currentOrderBook.forEach(b=>{ if(b.outcomeId!==undefined) totals[b.outcomeId]+=1; });
+        html += market.options.map((opt,i)=>`${opt.name}: <span style='color:#10b981;'>${totals[i]}</span>`).join(' &nbsp; ');
+        document.getElementById('totalBuys').innerHTML = html;
+      }
+    }
+
+    function renderOrderBookPro(orderBook, market, selectedOutcome) {
+      const obDiv = document.getElementById('orderBook');
+      
+      if (window.orderBookLoading) {
+        obDiv.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px;color:#9ca3af;"><div style='width:32px;height:32px;border:3px solid #374151;border-top:3px solid #10b981;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:12px;'></div><p>Loading order book...</p></div><style>@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}</style>`;
+        return;
+      }
+      
+      if (window.orderBookError) {
+        obDiv.innerHTML = `<div style='padding:48px;text-align:center;color:#ef4444;'><p>Failed to load order book: ${window.orderBookError}</p><button class='btn' onclick='window.reloadOrderBook && window.reloadOrderBook()'>Retry</button></div>`;
+        return;
+      }
+      
+      if (!orderBook || orderBook.length === 0) {
+        obDiv.innerHTML = '<div style="color:#9ca3af;">No orders yet.</div>';
+        return;
+      }
+      
+      const filtered = orderBook.filter(b => b.outcomeId === selectedOutcome);
+      const bids = filtered;
+      bids.sort((a,b) => b.price-a.price);
+      const maxShares = Math.max(...bids.map(x=>x.amount),1);
+      
+      let tabs = '';
+      (market.options||[]).forEach((opt,i)=>{
+        tabs += `<button class="ob-tab${i===selectedOutcome?' active':''}" data-idx="${i}" style="background:${i===selectedOutcome?'#10b981':'#23263a'};color:${i===selectedOutcome?'#041':'#f3f4f6'};border:2px solid ${i===selectedOutcome?'#10b981':'#374151'};padding:8px 16px;border-radius:8px;font-weight:600;cursor:pointer;transition:all 0.2s;margin-right:6px;">${opt.name}</button>`;
+      });
+      
+      function rowHtml(order) {
+        const barW = Math.max(8, 180*(order.amount/maxShares));
+        let odds = 2.0;
+        if (market && market.metadata && market.metadata.admin_odds && market.metadata.admin_odds[selectedOutcome]) {
+          odds = parseFloat(market.metadata.admin_odds[selectedOutcome]);
+        }
+        let payout = order.amount * odds;
+        let buyerCell = '-';
+        if (order.transactionSignature) {
+          const shortTx = order.transactionSignature.slice(0,4) + '...' + order.transactionSignature.slice(-4);
+          buyerCell = `<a href="https://solscan.io/tx/${order.transactionSignature}" target="_blank" rel="noopener" style="color:#10b981;font-weight:700;text-decoration:none;">${shortTx}</a>`;
+        }
+        return `<tr style="background:rgba(16,185,129,0.08);">
+          <td style="position:relative;">
+            <div style="position:absolute;left:0;top:0;height:100%;width:${barW}px;background:rgba(16,185,129,0.13);"></div>
+            <span style="position:relative;z-index:2;font-weight:600;color:#10b981;">${parseFloat(order.amount).toFixed(3)}</span>
+          </td>
+          <td style="position:relative;z-index:2;">${buyerCell}</td>
+          <td style="position:relative;z-index:2;color:#f3f4f6;">${payout.toFixed(3)} SOL</td>
+        </tr>`;
+      }
+      
+      let html = `<div style="display:flex;align-items:center;gap:18px;margin-bottom:12px;flex-wrap:wrap;">
+        <h3 style="color:#9aff00;margin:0;font-size:1.3rem;">Order Book</h3>
+        <div>${tabs}</div>
+      </div>`;
+      html += `<table style="width:100%;border-radius:10px;overflow:hidden;font-size:1rem;">
+        <thead><tr style="background:#23263a;color:#10b981;font-weight:700;"><th style="padding:8px;">Amount (SOL)</th><th>Buyer</th><th>Potential Payout</th></tr></thead>
+        <tbody>`;
+      bids.forEach(order=>{ html+=rowHtml(order); });
+      html += '</tbody></table>';
+      obDiv.innerHTML = html;
+      obDiv.querySelectorAll('.ob-tab').forEach(btn=>{
+        btn.onclick = ()=>renderOrderBookPro(orderBook,market,parseInt(btn.dataset.idx));
+      });
+    }
+
+    function updateTradePanel() {
+      if (!currentMarket || !currentMarket.options) return;
+      const opt = currentMarket.options[selectedOutcome];
+      // Show odds in trade panel if available
+      let odds = 2.0;
+      if (currentMarket && currentMarket.metadata && Array.isArray(currentMarket.metadata.admin_odds) && currentMarket.metadata.admin_odds[selectedOutcome]) {
+        odds = parseFloat(currentMarket.metadata.admin_odds[selectedOutcome]);
+      }
+      let oddsDisplay = `<span style='color:#f59e0b;font-size:1.08em;font-weight:700;margin-left:8px;'>x${odds.toFixed(2)}</span>`;
+      document.getElementById('tradeOptionName').innerHTML = `<span style='color:#9aff00;'>${opt.name}</span> ${opt.image?`<img src='${opt.image}' style='width:28px;height:28px;border-radius:50%;vertical-align:middle;margin-left:6px;'>`:''} ${oddsDisplay}`;
+      document.getElementById('tradeAmount').value = '';
+      document.getElementById('tradeMsg').textContent = '';
+      // Show potential payout even if no amount entered
+      const amt = parseFloat(document.getElementById('tradeAmount').value);
+      let payoutText = '';
+      if (amt && amt > 0) {
+        payoutText = `Potential Return: ${(amt * odds).toFixed(3)} SOL`;
+      } else {
+        payoutText = `Potential Return: 0.000 SOL`;
+      }
+      document.getElementById('profitCalc').textContent = payoutText;
+      calculateProfit();
+    }
+
+    async function handleBuy() {
+      const amt = parseFloat(document.getElementById('tradeAmount').value);
+      if (!amt || amt<=0) {
+        document.getElementById('tradeMsg').textContent = 'Enter a valid amount.';
+        return;
+      }
+      if (!walletPublicKey || !wallet) {
+        document.getElementById('tradeMsg').textContent = 'Please connect your wallet first.';
+        return;
+      }
+      
+      if (!window.solana || !window.solana.isConnected) {
+        document.getElementById('tradeMsg').textContent = 'Wallet disconnected. Please reconnect.';
+        return;
+      }
+      
+      document.getElementById('tradeMsg').textContent = 'Processing buy...';
+      try {
+        const marketEscrow = currentMarket.escrow || '3SgkeKqYFhJy7YA2yVdaJEcZxtHqX68DesouKH4A6evm';
+        const conn = getSolanaConnection();
+        
+        const tx = new solanaWeb3.Transaction().add(
+          solanaWeb3.SystemProgram.transfer({
+            fromPubkey: walletPublicKey,
+            toPubkey: new solanaWeb3.PublicKey(marketEscrow),
+            lamports: Math.round(amt * solanaWeb3.LAMPORTS_PER_SOL)
+          })
+        );
+        
+        tx.feePayer = walletPublicKey;
+        const { blockhash } = await conn.getLatestBlockhash();
+        tx.recentBlockhash = blockhash;
+        
+        const signed = await window.solana.signTransaction(tx);
+        const sig = await conn.sendRawTransaction(signed.serialize());
+        await conn.confirmTransaction(sig, 'confirmed');
+        
+        await fetch(`${API_BASE_URL}/bets`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            marketId: currentMarket.id,
+            optionId: selectedOutcome,
+            amount: amt,
+            bettorAddress: walletPublicKey.toString(),
+            transactionSignature: sig
+          })
+        });
+        
+        document.getElementById('tradeMsg').textContent = 'Buy order placed!';
+        await updateBalance();
+        if (typeof loadMarketPage === 'function') loadMarketPage();
+      } catch (e) {
+        console.error('Buy transaction error:', e);
+        document.getElementById('tradeMsg').textContent = 'Buy failed: ' + (e.message || e);
+      }
+    }
+
+    async function handleCancelPurchase() {
+      if (!walletPublicKey) {
+        document.getElementById('tradeMsg').textContent = 'Connect your wallet first.';
+        return;
+      }
+      document.getElementById('tradeMsg').textContent = 'Requesting cancellation...';
+      try {
+        await fetch(`${API_BASE_URL}/cancel`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            marketId: currentMarket.id,
+            optionId: selectedOutcome,
+            bettorAddress: walletPublicKey.toString()
+          })
+        });
+        document.getElementById('tradeMsg').textContent = 'Cancellation request sent. Refunds are processed within 24 hours.';
+      } catch (e) {
+        document.getElementById('tradeMsg').textContent = 'Cancellation failed: ' + (e.message || e);
+      }
+    }
+
+    function renderChart(market, orderBook) {
+      const optionTotals = Array((market.options||[]).length).fill(0);
+      (orderBook||[]).forEach(bet => {
+        if (bet.outcomeId !== undefined && bet.amount) {
+          optionTotals[bet.outcomeId] += bet.amount;
+        }
+      });
+      const total = optionTotals.reduce((a,b) => a+b, 0);
+      const data = {
+        labels: (market.options||[]).map(opt => opt.name),
+        datasets: [{
+          label: 'Bet Distribution',
+          data: optionTotals.map(x => total ? (x/total*100).toFixed(2) : 0),
+          backgroundColor: '#9aff00',
+          borderColor: '#7acc00',
+          borderWidth: 2
+        }]
+      };
+      const ctx = document.getElementById('marketChart').getContext('2d');
+      if (window.marketChartInstance) window.marketChartInstance.destroy();
+      window.marketChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data,
+        options: {
+          plugins: { legend: { display: false } },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              title: { display: true, text: '% of Total Bets' },
+              ticks: { color: '#9aff00' }
+            },
+            x: { ticks: { color: '#9aff00' } }
+          }
+        }
+      });
+    }
+
+    async function loadMarketPage() {
+  const marketId = getMarketId();
+  if (!marketId) {
+    document.getElementById('marketSection').innerHTML = '<div style="color:#ef4444;">Invalid market ID.</div>';
+    return;
+  }
+  
+  try {
+    // Fetch both market and orderbook data
+    const marketResponse = await fetch(`${API_BASE_URL}/markets/${marketId}`);
+    if (!marketResponse.ok) throw new Error('Failed to fetch market');
+    const marketData = await marketResponse.json();
+    
+    const orderBookResponse = await fetch(`${API_BASE_URL}/orderbook/${marketId}`);
+    if (!orderBookResponse.ok) throw new Error('Failed to fetch orderbook');
+    const orderBookData = await orderBookResponse.json();
+    
+    const market = marketData.market;
+    const orderBook = orderBookData.orderBook || orderBookData;
+    
+    // CRITICAL: Force parse metadata - this is where odds are stored
+    if (typeof market.metadata === 'string') {
+      market.metadata = JSON.parse(market.metadata);
+    }
+    if (!market.metadata || typeof market.metadata !== 'object') {
+      market.metadata = {};
+    }
+    
+    // Debug output
+    console.log('========================================');
+    console.log('MARKET LOADED');
+    console.log('Market ID:', market.id);
+    console.log('Market title:', market.title);
+    console.log('Metadata type:', typeof market.metadata);
+    console.log('Metadata:', market.metadata);
+    console.log('Admin odds:', market.metadata.admin_odds);
+    console.log('========================================');
+    
+    // Set global variables
+    currentMarket = market;
+    currentOrderBook = orderBook;
+    selectedOutcome = 0;
+    window.currentMarket = currentMarket;
+    window.currentOrderBook = currentOrderBook;
+    window.selectedOutcome = selectedOutcome;
+    
+    // Render everything
+    await renderMarketInfo(market);
+    renderChart(market, orderBook);
+    renderOrderBookPro(orderBook, market, 0);
+    updateTradePanel();
+    
+    // Setup buttons
+    document.getElementById('buyBtn').onclick = handleBuy;
+    document.getElementById('cancelBtn').onclick = handleCancelPurchase;
+    document.getElementById('tradeAmount').oninput = calculateProfit;
+    
+    // Load comments
+    await loadCommentsForMarket(marketId);
+    setupCommentBox(marketId);
+    
+  } catch (e) {
+    console.error('Load market error:', e);
+    document.getElementById('marketSection').innerHTML = `<div style='color:#ef4444;'>Error: ${e.message}</div>`;
+  }
+}
+
+    async function loadMyBets() {
+      // After loading bets, update nav with last picked option
+      try {
+        const res = await fetch(`${API_BASE_URL}/bets?address=${walletPublicKey.toString()}`);
+        const data = await res.json();
+        const bets = data.bets || [];
+        if (bets.length > 0) {
+          // Get the most recent bet
+          const lastBet = bets[0];
+          let optionName = '';
+          let optionImage = '';
+          if (lastBet.optionId !== undefined && lastBet.market_id) {
+            try {
+              const res = await fetch(`${API_BASE_URL}/markets/${lastBet.market_id}`);
+              if (res.ok) {
+                const market = (await res.json()).market;
+                if (market && market.options && market.options[lastBet.optionId]) {
+                  optionName = market.options[lastBet.optionId].name || '';
+                  optionImage = market.options[lastBet.optionId].image || '';
+                }
+              }
+            } catch {}
+          }
+          const navLink = document.getElementById('myBetsNavLink');
+          if (navLink && (optionName || optionImage)) {
+            navLink.innerHTML = `My Bets${optionImage ? ` <img src='${optionImage}' alt='' style='width:18px;height:18px;border-radius:50%;vertical-align:middle;margin-left:4px;'>` : ''}${optionName ? ` <span style='font-size:0.98em;color:#9aff00;'>${optionName}</span>` : ''}`;
+          }
+        }
+      } catch {}
+      const container = document.getElementById('betsContainer');
+      if (!walletPublicKey) {
+        container.innerHTML = `<div class="empty-state"><h3>Connect Wallet</h3><p>Connect your wallet to view your betting history.</p></div>`;
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE_URL}/bets?address=${walletPublicKey.toString()}`);
+        const data = await res.json();
+        const bets = data.bets || [];
+        if (bets.length === 0) {
+          container.innerHTML = `<div class="empty-state"><h3>No Bets Yet</h3><p>Your betting history will appear here once you place your first bet.</p></div>`;
+        } else {
+          const betCards = await Promise.all(bets.map(async bet => {
+            let optionName = '';
+            let optionImage = '';
+            let allOptions = [];
+            if (bet.optionId !== undefined && bet.market_id) {
+              try {
+                const res = await fetch(`${API_BASE_URL}/markets/${bet.market_id}`);
+                if (res.ok) {
+                  const market = (await res.json()).market;
+                  if (market && market.options) {
+                    allOptions = market.options;
+                    if (market.options[bet.optionId]) {
+                      optionName = market.options[bet.optionId].name || '';
+                      optionImage = market.options[bet.optionId].image || '';
+                    }
+                  }
+                }
+              } catch {}
+            }
+            let optionsHtml = '';
+            if (allOptions.length > 0) {
+              optionsHtml = `<div style="display:flex;gap:12px;margin-top:8px;">` +
+                allOptions.map((opt, idx) => {
+                  const picked = idx === bet.optionId;
+                  return `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px 10px;border-radius:10px;min-width:70px;background:${picked ? '#9aff00' : '#23263a'};color:${picked ? '#041' : '#bcd3e6'};border:2px solid ${picked ? '#9aff00' : '#23263a'};font-weight:${picked ? '800' : '600'};box-shadow:${picked ? '0 2px 8px rgba(154,255,0,0.13)' : 'none'};transition:all 0.2s;">
+                    ${opt.image ? `<img src='${opt.image}' alt='' style='width:22px;height:22px;border-radius:50%;background:#181e29;margin-bottom:4px;'>` : ''}
+                    <span style="font-size:1.01rem;">${opt.name || 'Option ' + (idx+1)}</span>
+                    ${picked ? '<span style=\'margin-top:3px;font-size:0.92em;font-weight:700;color:#10b981;\'>&#10003; Picked</span>' : ''}
+                  </div>`;
+                }).join('') + `</div>`;
+            } else if (optionName) {
+              optionsHtml = `<span style='display:flex;align-items:center;gap:6px;background:#23263a;padding:4px 10px;border-radius:8px;border:1.5px solid #9aff00;font-weight:700;color:#9aff00;'>${optionImage ? `<img src='${optionImage}' alt='' style='width:22px;height:22px;border-radius:50%;background:#181e29;'>` : ''}<span>${optionName}</span></span>`;
+            }
+            return `<div class="admin-card" style="background:#23263a;margin-bottom:18px;padding:18px 16px;border-radius:12px;">
+              <div class="market-title" style="font-weight:700;font-size:1.1rem;color:#9aff00;">${bet.market_title || 'Unknown Market'}</div>
+              <div style="display:flex;align-items:center;gap:10px;margin:8px 0;"><span style="color: #10b981; font-weight: 700;">Amount: ${parseFloat(bet.amount || 0).toFixed(3)} SOL</span></div>
+              ${optionsHtml}
+              <div style="color: #9ca3af; font-size: 12px;margin-top:6px;">${new Date(bet.created_at).toLocaleDateString()}${bet.transaction_signature ? ` | <a href="https://explorer.solana.com/tx/${bet.transaction_signature}?cluster=mainnet-beta" target="_blank" style="color: #10b981;">View TX</a>` : ''}</div>
+            </div>`;
+          }));
+          container.innerHTML = betCards.join('');
+        }
+      } catch (error) {
+        container.innerHTML = `<div class="empty-state"><h3>Error Loading Bets</h3><p>${error.message}</p></div>`;
+      }
+    }
+
+    async function loadCommentsForMarket(marketId) {
+      let bets = [];
+      try {
+        const res = await fetch(`${API_BASE_URL}/bets?market_id=${marketId}`);
+        if (res.ok) {
+          const data = await res.json();
+          bets = data.bets || [];
+        }
+      } catch {}
+      
+      let allComments = [];
+      for (const bet of bets) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/bets/${bet.id}/comments`);
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.comments)) {
+              data.comments.forEach(c => c.bet = bet);
+              allComments = allComments.concat(data.comments);
+            }
+          }
+        } catch {}
+      }
+      
+      allComments.sort((a,b) => new Date(a.created_at) - new Date(b.created_at));
+      renderCommentsList(allComments);
+    }
+
+    function renderCommentsList(comments) {
+      const listDiv = document.getElementById('commentsList');
+      if (!comments || comments.length === 0) {
+        listDiv.innerHTML = `<div style='color:#bcd3e6;'>No comments yet. Be the first to comment!</div>`;
+        return;
+      }
+      listDiv.innerHTML = comments.map(c => {
+        const shortAddr = c.user_address.slice(0,4) + '...' + c.user_address.slice(-4);
+        const pfp = `<span style="display:inline-block;width:32px;height:32px;border-radius:50%;background:#23263a;margin-right:10px;text-align:center;line-height:32px;font-weight:700;font-size:1.1rem;color:#9aff00;">${c.user_address[0]}</span>`;
+        const cleanText = removeLinks(escapeHtml(c.comment_text));
+        return `<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;">
+          ${pfp}
+          <div style="flex:1;">
+            <a href="https://solscan.io/address/${c.user_address}" target="_blank" rel="noopener" style="font-weight:700;color:#9aff00;font-size:1.01rem;text-decoration:none;cursor:pointer;">${shortAddr}</a>
+            <div style="color:#e6eef8;font-size:1.07rem;margin:2px 0 2px 0;white-space:pre-line;">${cleanText}</div>
+            <div style="color:#bcd3e6;font-size:0.97rem;">${new Date(c.created_at).toLocaleString()}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function escapeHtml(text) {
+      return text.replace(/[&<>"']/g, function(m) {
+        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'})[m];
+      });
+    }
+
+    function removeLinks(text) {
+      let cleaned = text.replace(/https?:\/\/\S+/gi, '').replace(/www\.[^\s]+/gi, '');
+      cleaned = cleaned.replace(/\b[a-zA-Z0-9.-]+\.(com|net|org|io|xyz|app|link|to|me|co|site|info|gov|edu)\b/gi, '');
+      return cleaned;
+    }
+
+    function setupCommentBox(marketId) {
+      const commentBox = document.getElementById('commentBoxContainer');
+      const loginMsg = document.getElementById('commentLoginMsg');
+      const postBtn = document.getElementById('postCommentBtn');
+      const commentInput = document.getElementById('commentInput');
+      const commentMsg = document.getElementById('commentMsg');
+      
+      commentBox.style.display = 'none';
+      loginMsg.textContent = '';
+      
+      if (!walletPublicKey || !walletPublicKey.toString) {
+        loginMsg.textContent = 'Connect your wallet and place a bet to comment.';
+        return;
+      }
+      
+      fetch(`${API_BASE_URL}/bets?address=${walletPublicKey.toString()}&market_id=${marketId}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.bets && data.bets.length > 0) {
+            commentBox.style.display = '';
+            loginMsg.textContent = '';
+            postBtn.onclick = async () => {
+              let text = commentInput.value.trim();
+              if (!text) {
+                commentMsg.textContent = 'Comment cannot be empty.';
+                return;
+              }
+              text = removeLinks(text);
+              const betId = data.bets[0].id;
+              postBtn.disabled = true;
+              commentMsg.textContent = 'Posting...';
+              try {
+                const res = await fetch(`${API_BASE_URL}/bets/${betId}/comments`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ user_address: walletPublicKey.toString(), comment_text: text })
+                });
+                const resp = await res.json();
+                if (res.ok && resp.comment) {
+                  commentInput.value = '';
+                  commentMsg.textContent = 'Comment posted!';
+                  await loadCommentsForMarket(marketId);
+                } else {
+                  commentMsg.textContent = resp.error || 'Failed to post comment.';
+                }
+              } catch (e) {
+                commentMsg.textContent = 'Failed to post comment.';
+              }
+              postBtn.disabled = false;
+            };
+          } else {
+            loginMsg.textContent = 'You must place a bet on this market to comment.';
+          }
+        });
+    }
+
+   function calculateProfit() {
+  const amt = parseFloat(document.getElementById('tradeAmount').value);
+  
+  console.log('Calculate profit called');
+  console.log('- Amount:', amt);
+  console.log('- Selected outcome:', selectedOutcome);
+  console.log('- Current market exists:', !!currentMarket);
+  
+  let odds = 2.0; // default
+  
+  if (currentMarket && currentMarket.metadata) {
+    console.log('- Metadata exists:', currentMarket.metadata);
+    console.log('- Admin odds:', currentMarket.metadata.admin_odds);
+    
+    if (Array.isArray(currentMarket.metadata.admin_odds)) {
+      const outcomeOdds = currentMarket.metadata.admin_odds[selectedOutcome];
+      if (outcomeOdds !== undefined && outcomeOdds !== null) {
+        odds = parseFloat(outcomeOdds);
+        console.log('✓ Using admin odds:', odds);
+      }
+    }
+  }
+  
+  if (!amt || amt <= 0) {
+    document.getElementById('profitCalc').textContent = `Potential Return: 0.000 SOL`;
+    return;
+  }
+  const payout = amt * odds;
+  document.getElementById('profitCalc').textContent = `Potential Return: ${payout.toFixed(3)} SOL`;
+  console.log('Final calculation:', amt, 'x', odds, '=', payout);
+}
+
+    // Event listeners
+    window.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('walletBtn');
+      btn.onclick = () => {
+        if (walletPublicKey) {
+          if (confirm('Disconnect wallet?')) disconnectWallet();
+        } else {
+          connectWallet();
+        }
+      };
+      
+      if (window.solana && window.solana.isPhantom) {
+        window.solana.on('connect', () => {
+          setWalletBtnConnected(window.solana.publicKey.toString());
+          walletPublicKey = window.solana.publicKey;
+          updateBalance();
+          updateAdminTabVisibility();
+        });
+        window.solana.on('disconnect', () => {
+          disconnectWallet();
+        });
+        window.solana.on('accountChanged', (pubkey) => {
+          if (pubkey) {
+            walletPublicKey = pubkey;
+            setWalletBtnConnected(pubkey.toString());
+            updateBalance();
+            updateAdminTabVisibility();
+          } else {
+            disconnectWallet();
+          }
+        });
+      }
+      
+      document.getElementById('tradeAmount').oninput = calculateProfit;
+      loadMarketPage();
+    });
+  </script>
+
+  <footer style="text-align:center; margin: 32px 0 16px 0;">
+    <a href="https://x.com/SolymarketCC" target="_blank" rel="noopener" class="primary" style="text-decoration:none;font-weight:600;font-size:16px;">
+      Follow us on Twitter/X &rarr; @SolymarketCC
+    </a>
+  </footer>
+</body>
+</html>
