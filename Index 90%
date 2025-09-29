@@ -600,8 +600,8 @@
         Solymarket
       </div>
       <nav class="nav">
-        <a href="#" class="nav-link active" data-section="markets">Markets</a>
-        <a href="#" class="nav-link" data-section="mybets">My Bets</a>
+  <a href="#" class="nav-link active" data-section="markets">Markets</a>
+  <a href="#" class="nav-link" data-section="mybets" id="myBetsNavLink">My Bets</a>
         <a href="#" class="nav-link" data-section="treasury">Treasury</a>
         <a href="#" class="nav-link" data-section="how">How It Works</a>
         <a href="#" id="adminTab" class="nav-link admin" data-section="admin" style="display:none">Admin Panel</a>
@@ -725,6 +725,23 @@
           <option value="tech">Technology</option>
           <option value="business">Business</option>
         </select>
+      </div>
+
+      <div class="form-group">
+
+        <label class="form-label">Market Profile Image <span style="color:#ef4444">*</span></label>
+        <div class="file-input-wrapper" style="display:flex;align-items:center;gap:16px;">
+          <div id="marketImagePreviewContainer" style="width:80px;height:80px;display:flex;align-items:center;justify-content:center;background:#f3f4f6;border-radius:12px;overflow:hidden;">
+            <img id="marketImagePreview" src="" alt="Preview" style="display:none;width:64px;height:64px;object-fit:cover;border-radius:50%;background:#e5e7eb;" />
+            <span id="marketImagePlaceholder" style="font-size:40px;color:#9ca3af;">?</span>
+          </div>
+          <div>
+            <label class="file-input-custom" id="marketImageLabel">
+              <span id="marketImageLabelText">Choose image</span>
+              <input type="file" accept="image/*" class="file-input-hidden" id="marketImageInput" onchange="handleMarketImageChange(event)">
+            </label>
+          </div>
+        </div>
       </div>
 
       <div class="form-group">
@@ -1296,21 +1313,30 @@
             <span class="option-name">${escapeHtml(option.name || 'Option')}</span>
           </div>
         `).join('');
+        // Market image display (prominent circle next to title)
+        const marketImageHtml = market.metadata && market.metadata.marketImage
+          ? `<img src="${market.metadata.marketImage}" alt="${escapeHtml(market.title)}" style="width:64px;height:64px;object-fit:cover;border-radius:50%;background:#e5e7eb;margin-right:12px;vertical-align:middle;">`
+          : `<span style="display:inline-block;width:64px;height:64px;border-radius:50%;background:#f3f4f6;color:#9ca3af;font-size:32px;line-height:64px;text-align:center;margin-right:12px;vertical-align:middle;">?</span>`;
         // Admin delete button logic
         let deleteBtn = '';
         if (isAdmin) {
           deleteBtn = `<button class="btn-danger" style="float:right; margin-top: -8px; margin-bottom: 8px;" onclick="event.stopPropagation(); deleteMarket(${market.id})">Delete</button>`;
         }
         return `
-          <div class="market-card" onclick="showMarketDetail(${market.id})">
-            ${deleteBtn}
-            <div class="market-title">${escapeHtml(market.title || 'Untitled Market')}</div>
-            <div class="market-meta">
-              <div class="badge ${market.status === 'under_review' ? 'pending' : ''}">${escapeHtml(market.category || 'Other')}</div>
-              <div class="volume">${parseFloat(market.total_volume || 0).toFixed(3)} SOL</div>
-              ${market.status === 'under_review' ? '<div class="badge pending">Under Review</div>' : ''}
+          <div class="market-card" onclick="showMarketDetail(${market.id})" style="display:flex;flex-direction:column;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              ${marketImageHtml}
+              <div style="flex:1;">
+                <div class="market-title" style="font-size:1.1em;font-weight:600;">${escapeHtml(market.title || 'Untitled Market')}</div>
+                <div class="market-meta">
+                  <div class="badge ${market.status === 'under_review' ? 'pending' : ''}">${escapeHtml(market.category || 'Other')}</div>
+                  <div class="volume">${parseFloat(market.total_volume || 0).toFixed(3)} SOL</div>
+                  ${market.status === 'under_review' ? '<div class="badge pending">Under Review</div>' : ''}
+                </div>
+              </div>
+              ${deleteBtn}
             </div>
-            <div class="options-preview">${optionsHtml}</div>
+            <div class="options-preview" style="margin-top:8px;">${optionsHtml}</div>
             <div style="margin-top: 12px; font-size: 12px; color: #9ca3af;">
               Created: ${new Date(market.created_at).toLocaleDateString()}
             </div>
@@ -1355,14 +1381,22 @@ function showMarketDetail(marketId) {
       document.getElementById('marketTitle').value = '';
       document.getElementById('marketCategory').value = 'other';
       document.getElementById('marketEndDate').value = '';
-      
+      // Reset market image preview and input
+      const preview = document.getElementById('marketImagePreview');
+      const placeholder = document.getElementById('marketImagePlaceholder');
+      const labelText = document.getElementById('marketImageLabelText');
+      const input = document.getElementById('marketImageInput');
+      if (preview) preview.src = '';
+      if (preview) preview.style.display = 'none';
+      if (placeholder) placeholder.style.display = 'block';
+      if (labelText) labelText.textContent = 'Choose image';
+      if (input) input.value = '';
       // Reset options
       options = [
         { name: 'Yes', image: null, file: null },
         { name: 'No', image: null, file: null }
       ];
       renderOptionsBuilder();
-      
       // Set minimum date
       const minDate = new Date();
       minDate.setHours(minDate.getHours() + 1);
@@ -1458,33 +1492,56 @@ function showMarketDetail(marketId) {
 
     async function createMarket() {
       const submitBtn = document.getElementById('submitCreateBtn');
-      
       const title = document.getElementById('marketTitle').value.trim();
       const category = document.getElementById('marketCategory').value;
       const endDate = document.getElementById('marketEndDate').value;
-      
+      const marketImageInput = document.getElementById('marketImageInput');
+      const marketImageFile = marketImageInput.files[0];
       // Validation
       if (!title || title.length < 10) {
         toast('Market question must be at least 10 characters');
         return;
       }
-      
       if (!endDate) {
         toast('Please set an end date');
         return;
       }
-      
+      if (!marketImageFile) {
+        toast('Please upload a market profile image');
+        return;
+      }
+      // Market image is optional, but recommended
+      if (!marketImageFile) {
+        toast('No market profile image selected (recommended)', 'info');
+      }
       // Validate options
       const validOptions = options.filter(opt => opt.name && opt.name.trim());
       if (validOptions.length < 2) {
         toast('At least 2 options with names are required');
         return;
       }
-      
       try {
         setLoading(submitBtn, true);
         toast('Creating market on MAINNET...');
-        // Upload images first (with better error handling)
+        // Upload market profile image
+        let marketImageUrl = null;
+        if (marketImageFile) {
+          const formData = new FormData();
+          formData.append('file', marketImageFile);
+          const uploadResponse = await fetch(API_BASE_URL + '/upload', {
+            method: 'POST',
+            body: formData
+          });
+          if (uploadResponse.ok) {
+            const uploadData = await uploadResponse.json();
+            marketImageUrl = uploadData.url;
+          } else {
+            toast('Failed to upload market image', 'error');
+            setLoading(submitBtn, false);
+            return;
+          }
+        }
+        // Upload option images (if any)
         const processedOptions = [];
         for (const option of validOptions) {
           let imageUrl = null;
@@ -1556,9 +1613,33 @@ function showMarketDetail(marketId) {
             endDate: endDate,
             initialLiquidity: 0,
             options: processedOptions,
-            creationSignature: signature
+            creationSignature: signature,
+            marketImage: marketImageUrl
           })
         });
+    // Market profile image upload preview logic
+    function handleMarketImageChange(e) {
+      const file = e.target.files[0];
+      const preview = document.getElementById('marketImagePreview');
+      const placeholder = document.getElementById('marketImagePlaceholder');
+      const labelText = document.getElementById('marketImageLabelText');
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          preview.src = ev.target.result;
+          preview.style.display = 'block';
+          placeholder.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+        labelText.textContent = file.name;
+      } else {
+        preview.src = '';
+        preview.style.display = 'none';
+        placeholder.style.display = 'block';
+        labelText.textContent = 'Choose image';
+      }
+    }
+    window.handleMarketImageChange = handleMarketImageChange;
         // Update balance (skip if RPC issues)
         if (!rpcFallbackMode && !isAdmin) {
           try {
@@ -1772,7 +1853,6 @@ function showMarketDetail(marketId) {
       try {
         const response = await apiRequest(`/bets?address=${wallet.toString()}`);
         const bets = response.bets || [];
-        
         if (bets.length === 0) {
           container.innerHTML = `
             <div class="empty-state">
@@ -1781,18 +1861,42 @@ function showMarketDetail(marketId) {
             </div>
           `;
         } else {
-          container.innerHTML = bets.map(bet => `
-            <div class="admin-card">
-              <div class="market-title">${escapeHtml(bet.market_title || 'Unknown Market')}</div>
-              <div style="color: #10b981; font-weight: 700; margin: 8px 0;">
-                Amount: ${parseFloat(bet.amount || 0).toFixed(3)} SOL
+          // For each bet, fetch the market to get options and odds
+          const betCards = await Promise.all(bets.map(async bet => {
+            let optionName = '';
+            let optionImage = '';
+            let odds = 2.0;
+            if (bet.option_id !== undefined && bet.market_id) {
+              try {
+                const res = await apiRequest(`/markets/${bet.market_id}`);
+                if (res.market && res.market.options && res.market.options[bet.option_id]) {
+                  optionName = res.market.options[bet.option_id].name || '';
+                  optionImage = res.market.options[bet.option_id].image || '';
+                  // Try to get odds from metadata
+                  if (res.market.metadata && res.market.metadata.admin_odds && res.market.metadata.admin_odds[bet.option_id]) {
+                    odds = parseFloat(res.market.metadata.admin_odds[bet.option_id]);
+                  }
+                }
+              } catch {}
+            }
+            const potentialReturn = (parseFloat(bet.amount || 0) * odds).toFixed(3);
+            return `
+              <div class="admin-card">
+                <div class="market-title">${escapeHtml(bet.market_title || 'Unknown Market')}</div>
+                <div style="display:flex;align-items:center;gap:12px;margin:8px 0;">
+                  <span style="color: #10b981; font-weight: 700;">Amount: ${parseFloat(bet.amount || 0).toFixed(3)} SOL</span>
+                  ${optionImage ? `<img src='${optionImage}' alt='' style='width:22px;height:22px;border-radius:50%;background:#181e29;margin-left:8px;'>` : ''}
+                  <span style="font-weight:600;color:#9aff00;">${escapeHtml(optionName)}</span>
+                </div>
+                <div style="color:#f59e0b;font-weight:700;margin-bottom:4px;">Potential Return: ${potentialReturn} SOL</div>
+                <div style="color: #9ca3af; font-size: 12px;">
+                  ${new Date(bet.created_at).toLocaleDateString()}
+                  ${bet.transaction_signature ? ` | <a href=\"https://explorer.solana.com/tx/${bet.transaction_signature}?cluster=mainnet-beta\" target=\"_blank\" style=\"color: #10b981;\">View TX</a>` : ''}
+                </div>
               </div>
-              <div style="color: #9ca3af; font-size: 12px;">
-                ${new Date(bet.created_at).toLocaleDateString()}
-                ${bet.transaction_signature ? ` | <a href="https://explorer.solana.com/tx/${bet.transaction_signature}?cluster=mainnet-beta" target="_blank" style="color: #10b981;">View TX</a>` : ''}
-              </div>
-            </div>
-          `).join('');
+            `;
+          }));
+          container.innerHTML = betCards.join('');
         }
       } catch (error) {
         console.error('Failed to load bets:', error);
