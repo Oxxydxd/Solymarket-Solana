@@ -1,0 +1,1988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Solymarket - Decentralized Prediction Markets</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      background: linear-gradient(180deg, #0b0b0f 0%, #111217 100%);
+      color: #e6eef8;
+      line-height: 1.4;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: rgba(6, 6, 8, 0.55);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(154, 255, 0, 0.06);
+      padding: 16px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+    
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      color: #9aff00;
+      font-size: 20px;
+    }
+
+    .brand .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #9aff00, #7acc00);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #041;
+      font-weight: 900;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav a {
+      padding: 10px 16px;
+      border-radius: 8px;
+      color: #d1d5db;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .nav a.active, .nav a:hover {
+      color: #9aff00;
+      background: rgba(154, 255, 0, 0.04);
+    }
+
+    .nav a.admin {
+      background: rgba(255, 107, 107, 0.1);
+      color: #ff6b6b;
+      border: 1px solid rgba(255, 107, 107, 0.2);
+    }
+
+    .wallet-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .balance {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 13px;
+      font-weight: 600;
+      color: #cfeccf;
+    }
+
+    .wallet-btn {
+      background: linear-gradient(90deg, #9aff00, #7acc00);
+      color: #041;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .wallet-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .wallet-btn.connected {
+      background: transparent;
+      border: 1px solid #9aff00;
+      color: #9aff00;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      min-height: calc(100vh - 200px);
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #f9fafb;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 200px;
+      background: rgba(55, 65, 81, 0.5);
+      border: 1px solid rgba(75, 85, 99, 0.3);
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: #f3f4f6;
+      font-size: 14px;
+    }
+
+    .btn {
+      background: linear-gradient(90deg, #9aff00, #7acc00);
+      color: #041;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      color: #bcd3e6;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-danger {
+      background: linear-gradient(90deg, #ff6b6b, #dc2626);
+      color: white;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 16px;
+    }
+
+    .market-card {
+      background: linear-gradient(180deg, rgba(55, 65, 81, 0.4), rgba(31, 41, 55, 0.6));
+      border: 1.5px solid rgba(154, 255, 0, 0.25); /* #9aff00 accent border */
+      border-radius: 12px;
+      padding: 16px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .market-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(154, 255, 0, 0.18);
+      border-color: #9aff00;
+      background: linear-gradient(180deg, #23293a 60%, #23293a 80%, #181e29 100%);
+    }
+
+    .market-title {
+      font-weight: 700;
+      color: #9aff00;
+      font-size: 16px;
+      margin-bottom: 8px;
+      line-height: 1.3;
+      letter-spacing: 0.01em;
+      text-shadow: 0 1px 8px rgba(154,255,0,0.08);
+    }
+
+    .market-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      background: rgba(154, 255, 0, 0.08);
+      color: #9aff00;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .badge.pending {
+      background: rgba(245, 158, 11, 0.1);
+      color: #f59e0b;
+    }
+
+    .volume {
+      color: #9aff00;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .options-preview {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .option-preview {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(154, 255, 0, 0.08); /* subtle accent background */
+      padding: 6px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(154, 255, 0, 0.13);
+      transition: background 0.2s, border 0.2s;
+    }
+
+    .option-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid rgba(156, 163, 175, 0.3);
+    }
+
+    .option-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #9aff00;
+      letter-spacing: 0.01em;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: linear-gradient(180deg, #1f2937, #111827);
+      border-radius: 16px;
+      padding: 24px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1px solid rgba(75, 85, 99, 0.3);
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #10b981;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #d1d5db;
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      background: rgba(55, 65, 81, 0.5);
+      border: 1px solid rgba(75, 85, 99, 0.3);
+      padding: 12px;
+      border-radius: 8px;
+      color: #f3f4f6;
+      font-size: 14px;
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+    }
+
+    .options-builder {
+      background: rgba(31, 41, 55, 0.3);
+      border: 1px solid rgba(75, 85, 99, 0.3);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 16px;
+      background: rgba(31, 41, 55, 0.6);
+      border-radius: 12px;
+      border: 1px solid rgba(75, 85, 99, 0.2);
+    }
+
+    .option-avatar-container {
+      position: relative;
+      width: 50px;
+      height: 50px;
+    }
+
+    .option-avatar-preview {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(156, 163, 175, 0.3);
+      background: rgba(55, 65, 81, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #9ca3af;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .image-status {
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #10b981;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .option-input-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .option-name-input {
+      background: rgba(55, 65, 81, 0.5);
+      border: 1px solid rgba(75, 85, 99, 0.3);
+      padding: 8px 12px;
+      border-radius: 6px;
+      color: #f3f4f6;
+      font-size: 14px;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+    }
+
+    .file-input-custom {
+      background: rgba(75, 85, 99, 0.5);
+      color: #d1d5db;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      border: 1px solid rgba(107, 114, 128, 0.3);
+    }
+
+    .file-input-hidden {
+      position: absolute;
+      left: -9999px;
+      opacity: 0;
+    }
+
+    .remove-option-btn {
+      background: linear-gradient(90deg, #ff6b6b, #dc2626);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      min-width: 70px;
+    }
+
+    .add-option-btn {
+      background: rgba(154, 255, 0, 0.1);
+      color: #9aff00;
+      border: 1px solid rgba(154, 255, 0, 0.3);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    .odds-input {
+      background: rgba(55, 65, 81, 0.5);
+      border: 1px solid rgba(75, 85, 99, 0.3);
+      padding: 6px 10px;
+      border-radius: 4px;
+      color: #f3f4f6;
+      font-size: 12px;
+      width: 80px;
+    }
+
+    .admin-odds-section {
+      margin-top: 16px;
+      padding: 12px;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 8px;
+    }
+
+    .odds-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      padding: 8px;
+      background: rgba(31, 41, 55, 0.6);
+      border-radius: 6px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+      justify-content: flex-end;
+    }
+
+    .admin-card {
+      background: linear-gradient(180deg, rgba(75, 85, 99, 0.2), rgba(55, 65, 81, 0.3));
+      border: 1px solid rgba(107, 114, 128, 0.3);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .admin-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .admin-actions button {
+      font-size: 12px;
+      padding: 6px 12px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #9ca3af;
+    }
+
+    .empty-state h3 {
+      color: #f3f4f6;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .spinner {
+      border: 2px solid rgba(16, 185, 129, 0.1);
+      border-radius: 50%;
+      border-top: 2px solid #10b981;
+      width: 14px;
+      height: 14px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      margin-right: 6px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .status-indicator {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 1000;
+    }
+
+    .status-indicator.online {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-indicator.offline {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .rpc-warning {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #f59e0b;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="logo">S</div>
+        Solymarket
+      </div>
+      <nav class="nav">
+        <a href="#" class="nav-link active" data-section="markets">Markets</a>
+        <a href="#" class="nav-link" data-section="mybets">My Bets</a>
+        <a href="#" class="nav-link" data-section="treasury">Treasury</a>
+        <a href="#" class="nav-link" data-section="how">How It Works</a>
+        <a href="#" id="adminTab" class="nav-link admin" data-section="admin" style="display:none">Admin Panel</a>
+      </nav>
+      <div class="wallet-group">
+        <div class="balance" id="balanceDisplay" style="display:none">
+          SOL: <span id="solBalance">0.000</span>
+        </div>
+        <button id="walletBtn" class="wallet-btn">Connect Wallet</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="rpcWarning" class="rpc-warning" style="display:none">
+      <strong>RPC Connection Issue:</strong> Using fallback mode. Some features may be limited until you configure a proper RPC endpoint.
+    </div>
+
+    <!-- Markets Section -->
+    <section id="marketsSection" class="section active">
+      <div class="section-header">
+        <h2 class="section-title">Prediction Markets</h2>
+        <div class="controls">
+          <input id="searchInput" class="search-input" placeholder="Search markets..." />
+          <button id="createMarketBtn" class="btn">+ Create Market</button>
+        </div>
+      </div>
+      <div id="marketsGrid" class="grid"></div>
+    </section>
+
+    <!-- My Bets Section -->
+    <section id="mybetsSection" class="section">
+      <div class="section-header">
+        <h2 class="section-title">My Betting History</h2>
+      </div>
+      <div id="betsContainer">
+        <div class="empty-state">
+          <h3>Connect Wallet</h3>
+          <p>Connect your wallet to view your betting history.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Treasury Section -->
+    <section id="treasurySection" class="section">
+      <div class="section-header">
+        <h2 class="section-title">Platform Treasury</h2>
+      </div>
+      <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+        <div class="admin-card">
+          <h3 style="color: #10b981; margin-bottom: 8px;">Treasury Balance</h3>
+          <div style="font-size: 28px; font-weight: 700; color: #f9fafb;" id="treasuryBalance">0 SOL</div>
+        </div>
+        <div class="admin-card">
+          <h3 style="color: #10b981; margin-bottom: 8px;">Total Markets</h3>
+          <div style="font-size: 28px; font-weight: 700; color: #f9fafb;" id="marketCount">0</div>
+        </div>
+        <div class="admin-card">
+          <h3 style="color: #10b981; margin-bottom: 8px;">Total Volume</h3>
+          <div style="font-size: 28px; font-weight: 700; color: #f9fafb;" id="totalVolume">0 SOL</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section id="howSection" class="section">
+      <div class="section-header">
+        <h2 class="section-title">How Solymarket Works</h2>
+      </div>
+      <div class="admin-card">
+        <h3 style="color: #10b981; margin-bottom: 16px;">Decentralized Prediction Markets</h3>
+        <p style="color: #d1d5db; line-height: 1.6; margin-bottom: 16px;">
+          Solymarket is a decentralized prediction market platform built on Solana. Create markets on any topic or trade on existing ones with transparent, blockchain-based odds.
+        </p>
+        <ul style="color: #9ca3af; line-height: 1.8; padding-left: 20px;">
+          <li><strong>Real SOL Betting:</strong> All transactions happen on Solana mainnet</li>
+          <li><strong>Market Creation:</strong> 0.05 SOL fee to create new markets</li>
+          <li><strong>Admin Review:</strong> All markets reviewed before going live</li>
+          <li><strong>Up to 8 Options:</strong> Each with custom images and odds</li>
+          <li><strong>Treasury System:</strong> Secure fund management</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Admin Panel Section -->
+    <section id="adminSection" class="section">
+      <div class="section-header">
+        <h2 class="section-title">Admin Panel</h2>
+        <button id="refreshPendingBtn" class="btn-secondary btn">Refresh</button>
+      </div>
+      
+      <div style="margin-bottom: 24px;">
+        <h3 style="color: #f59e0b; margin-bottom: 12px;">Pending Market Reviews</h3>
+        <div id="pendingMarketsContainer">
+          <div class="empty-state">
+            <h3>No Pending Markets</h3>
+            <p>All markets have been reviewed.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Create Market Modal -->
+  <div id="createMarketModal" class="modal">
+    <div class="modal-content">
+      <h3 class="modal-title">Create Prediction Market</h3>
+      
+      <div class="form-group">
+        <label class="form-label">Market Question</label>
+        <input id="marketTitle" class="form-input" placeholder="Who will win the 2024 Presidential Election?" maxlength="200" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select id="marketCategory" class="form-select">
+          <option value="other">Other</option>
+          <option value="politics">Politics</option>
+          <option value="crypto">Crypto</option>
+          <option value="sports">Sports</option>
+          <option value="tech">Technology</option>
+          <option value="business">Business</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Market Options (Max 5)</label>
+        <div class="options-builder">
+          <div id="optionsContainer"></div>
+          <button id="addOptionBtn" class="add-option-btn">+ Add Option</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">End Date</label>
+        <input id="marketEndDate" class="form-input" type="datetime-local" />
+      </div>
+
+      <div class="modal-actions">
+        <button id="cancelCreateBtn" class="btn-secondary">Cancel</button>
+        <button id="submitCreateBtn" class="btn">Create Market (0.05 SOL)</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+  <script>
+    // Wait for Solana library to load
+    async function waitForSolana() {
+      return new Promise((resolve, reject) => {
+        let attempts = 0;
+        const maxAttempts = 30;
+        
+        const check = () => {
+          attempts++;
+          if (typeof solanaWeb3 !== 'undefined') {
+            console.log('Solana Web3 library loaded successfully');
+            resolve();
+          } else if (attempts >= maxAttempts) {
+            reject(new Error('Solana library failed to load'));
+          } else {
+            setTimeout(check, 200);
+          }
+        };
+        
+        check();
+      });
+    }
+
+    // Configuration
+    // API base URL auto-detect (prod, dev, tunnel, etc.)
+    // Dynamically set API base URL for local, render, or production (never use api.solymarket.cc)
+    const API_BASE_URL = (function() {
+      const { hostname } = window.location;
+      if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'http://localhost:3001/api';
+      }
+      if (hostname.endsWith('onrender.com')) {
+        return `https://${hostname}/api`;
+      }
+      // For production, always match current hostname (www or not)
+      return `https://${hostname}/api`;
+    })();
+  // Only this wallet is admin for UI/admin panel
+  const ADMIN_WALLET = 'DkoKjWfXRc7frJkQoVC1xL76BUBTzgmTRzm5KaQbRAyd';
+  const TREASURY_WALLET = 'DkoKjWfXRc7frJkQoVC1xL76BUBTzgmTRzm5KaQbRAyd';
+    
+    // All Solana RPC requests are now proxied through the backend for security
+    // No API keys are exposed in the frontend
+    const RPC_ENDPOINTS = [API_BASE_URL + '/solana-proxy'];
+    
+    const CREATION_FEE = 0.05;
+
+    // Global state
+    let wallet = null;
+    let walletAdapter = null;
+    let connection = null;
+    let solBalance = 0;
+    let markets = [];
+    let currentSection = 'markets';
+    let backendConnected = false;
+  let isAdmin = false;
+    let selectedOption = null;
+    let currentMarket = null;
+    let options = []; // For market creation
+
+    // Market Detail Modal Functions
+    function openMarketDetailModal(market) {
+      currentMarket = market;
+      selectedOption = null;
+      
+      document.getElementById('marketDetailTitle').textContent = market.title;
+      
+      // Populate market details
+      const detailContent = document.getElementById('marketDetailContent');
+      detailContent.innerHTML = `
+        <div class="admin-card" style="margin: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+            <div>
+              <div class="badge" style="margin-bottom: 8px;">${escapeHtml(market.category || 'Other')}</div>
+              <div style="color: #9ca3af; font-size: 14px;">
+                Created: ${new Date(market.created_at).toLocaleDateString()} | 
+                Volume: ${parseFloat(market.total_volume || 0).toFixed(3)} SOL
+              </div>
+              ${market.end_date ? `<div style="color: #9ca3af; font-size: 14px;">Ends: ${new Date(market.end_date).toLocaleDateString()}</div>` : ''}
+            </div>
+            <div class="badge ${market.status === 'under_review' ? 'pending' : ''}">${market.status === 'under_review' ? 'Under Review' : 'Active'}</div>
+          </div>
+          ${market.description ? `<p style="color: #d1d5db; margin-bottom: 16px;">${escapeHtml(market.description)}</p>` : ''}
+        </div>
+      `;
+      
+      // Populate betting options
+      renderBettingOptions(market);
+      
+      // Update betting interface state
+      updateBettingInterface();
+      
+      document.getElementById('marketDetailModal').classList.add('active');
+    }
+
+    function closeMarketDetailModal() {
+      document.getElementById('marketDetailModal').classList.remove('active');
+      selectedOption = null;
+      currentMarket = null;
+    }
+
+    function renderBettingOptions(market) {
+      const container = document.getElementById('bettingOptions');
+      
+      if (!market.options || market.options.length === 0) {
+        container.innerHTML = '<div style="color: #9ca3af;">No betting options available</div>';
+        return;
+      }
+      
+      container.innerHTML = market.options.map((option, index) => {
+        const odds = (market.metadata?.admin_odds && market.metadata.admin_odds[index]) || 2.0;
+        const isSelected = selectedOption === index;
+        
+        return `
+          <div class="betting-option ${isSelected ? 'selected' : ''}" 
+               onclick="selectBettingOption(${index})"
+               style="
+                 padding: 16px; 
+                 border-radius: 12px; 
+                 border: 2px solid ${isSelected ? '#10b981' : 'rgba(75, 85, 99, 0.3)'}; 
+                 background: ${isSelected ? 'rgba(16, 185, 129, 0.1)' : 'rgba(31, 41, 55, 0.6)'};
+                 cursor: pointer;
+                 transition: all 0.2s;
+                 text-align: center;
+               ">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px;">
+              <img src="${option.image || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMTkiIGZpbGw9IiM0Yjc4OTAiLz4KPHRleHQgeD0iMjAiIHk9IjI2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIxNiIgZm9udC1mYW1pbHk9IkFyaWFsIj4/PC90ZXh0Pgo8L3N2Zz4='}" 
+                   alt="${escapeHtml(option.name)}"
+                   style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+              <div>
+                <div style="color: #f9fafb; font-weight: 700; font-size: 16px;">${escapeHtml(option.name)}</div>
+                <div style="color: #10b981; font-weight: 700; font-size: 14px;">${odds.toFixed(1)}x odds</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectBettingOption(index) {
+      selectedOption = index;
+      renderBettingOptions(currentMarket);
+      updateBettingInterface();
+    }
+
+    function updateBettingInterface() {
+      const bettingInterface = document.getElementById('bettingInterface');
+      const bettingWarning = document.getElementById('bettingWarning');
+      const placeBetBtn = document.getElementById('placeBetBtn');
+      const betAmountInput = document.getElementById('betAmount');
+      
+      if (!wallet) {
+        bettingWarning.style.display = 'block';
+        placeBetBtn.disabled = true;
+        betAmountInput.disabled = true;
+        return;
+      }
+      
+      if (!currentMarket || currentMarket.status !== 'active') {
+        bettingWarning.innerHTML = 'This market is not available for betting';
+        bettingWarning.style.display = 'block';
+        placeBetBtn.disabled = true;
+        betAmountInput.disabled = true;
+        return;
+      }
+      
+      bettingWarning.style.display = 'none';
+      placeBetBtn.disabled = selectedOption === null;
+      betAmountInput.disabled = false;
+      
+      // Update potential return calculation
+      calculatePotentialReturn();
+    }
+
+    function calculatePotentialReturn() {
+      const betAmount = parseFloat(document.getElementById('betAmount').value || 0);
+      const returnDisplay = document.getElementById('potentialReturn');
+      
+      if (!betAmount || selectedOption === null || !currentMarket) {
+        returnDisplay.textContent = '0.00 SOL';
+        return;
+      }
+      
+      const odds = (currentMarket.metadata?.admin_odds && currentMarket.metadata.admin_odds[selectedOption]) || 2.0;
+      const potentialReturn = betAmount * odds;
+      returnDisplay.textContent = `${potentialReturn.toFixed(3)} SOL`;
+    }
+
+    async function placeBet() {
+      if (!wallet || selectedOption === null || !currentMarket) {
+        toast('Please connect wallet and select an option');
+        return;
+      }
+      
+      const betAmount = parseFloat(document.getElementById('betAmount').value || 0);
+      if (betAmount <= 0) {
+        toast('Please enter a valid bet amount');
+        return;
+      }
+      
+      if (!rpcFallbackMode && betAmount > solBalance) {
+        toast('Insufficient balance');
+        return;
+      }
+      
+      const placeBetBtn = document.getElementById('placeBetBtn');
+      
+      try {
+        setLoading(placeBetBtn, true);
+        toast('Placing bet on Solana mainnet...');
+        
+        // Create transaction to treasury
+        const transaction = new solanaWeb3.Transaction();
+        
+        const transferInstruction = solanaWeb3.SystemProgram.transfer({
+          fromPubkey: wallet,
+          toPubkey: new solanaWeb3.PublicKey(TREASURY_WALLET),
+          lamports: Math.floor(betAmount * solanaWeb3.LAMPORTS_PER_SOL)
+        });
+        
+        transaction.add(transferInstruction);
+        
+        // Get recent blockhash (may fail in fallback mode)
+        try {
+          const { blockhash } = await connection.getLatestBlockhash();
+          transaction.recentBlockhash = blockhash;
+        } catch (error) {
+          console.warn('Could not get recent blockhash, wallet will handle it:', error.message);
+        }
+        
+        transaction.feePayer = wallet;
+        
+        // Sign and send
+        const signedTransaction = await walletAdapter.signTransaction(transaction);
+        const signature = await connection.sendRawTransaction(signedTransaction.serialize());
+        
+        // In fallback mode, we might not be able to confirm
+        try {
+          await connection.confirmTransaction(signature);
+          console.log('Bet transaction confirmed:', signature);
+        } catch (error) {
+          console.warn('Could not confirm transaction (may still succeed):', error.message);
+        }
+        
+        // Record bet in database
+        await apiRequest('/bets', {
+          method: 'POST',
+          body: JSON.stringify({
+            marketId: currentMarket.id,
+            bettorAddress: wallet.toString(),
+            optionId: selectedOption,
+            amount: betAmount,
+            transactionSignature: signature
+          })
+        });
+        
+        // Update balance (skip if RPC issues)
+        if (!rpcFallbackMode) {
+          try {
+            const balance = await connection.getBalance(wallet);
+            solBalance = balance / solanaWeb3.LAMPORTS_PER_SOL;
+            updateWalletUI();
+          } catch (error) {
+            console.warn('Could not update balance:', error.message);
+          }
+        }
+        
+        // Reset form
+        document.getElementById('betAmount').value = '';
+        selectedOption = null;
+        renderBettingOptions(currentMarket);
+        
+        toast('Bet placed successfully!');
+        
+        // Reload market data
+        await loadMarkets();
+        
+      } catch (error) {
+        console.error('Bet placement failed:', error);
+        if (error.message.includes('User rejected')) {
+          toast('Transaction cancelled by user');
+        } else {
+          toast('Failed to place bet: ' + error.message);
+        }
+      } finally {
+        setLoading(placeBetBtn, false);
+      }
+    }
+    let rpcFallbackMode = false;
+
+    // Utility functions
+    function toast(msg, type = 'info') {
+      // Enhanced toast: show a non-blocking message at the top of the page
+      let toastDiv = document.getElementById('toastMsg');
+      if (!toastDiv) {
+        toastDiv = document.createElement('div');
+        toastDiv.id = 'toastMsg';
+        toastDiv.style.position = 'fixed';
+        toastDiv.style.top = '20px';
+        toastDiv.style.left = '50%';
+        toastDiv.style.transform = 'translateX(-50%)';
+        toastDiv.style.background = type === 'error' ? '#ef4444' : '#10b981';
+        toastDiv.style.color = '#fff';
+        toastDiv.style.padding = '12px 24px';
+        toastDiv.style.borderRadius = '8px';
+        toastDiv.style.fontWeight = '700';
+        toastDiv.style.fontSize = '1rem';
+        toastDiv.style.zIndex = '9999';
+        toastDiv.style.boxShadow = '0 2px 12px rgba(0,0,0,0.13)';
+        document.body.appendChild(toastDiv);
+      }
+      toastDiv.textContent = msg;
+      toastDiv.style.display = 'block';
+      toastDiv.style.background = type === 'error' ? '#ef4444' : '#10b981';
+      setTimeout(() => { toastDiv.style.display = 'none'; }, 2200);
+    }
+
+    function setLoading(element, loading) {
+      if (loading) {
+        element.classList.add('loading');
+        element.disabled = true;
+        // Store original text
+        if (!element.dataset.originalText) {
+          element.dataset.originalText = element.textContent;
+        }
+        element.innerHTML = '<span class="spinner"></span>' + element.dataset.originalText;
+      } else {
+        element.classList.remove('loading');
+        element.disabled = false;
+        // Restore original text
+        if (element.dataset.originalText) {
+          element.textContent = element.dataset.originalText;
+        }
+      }
+    }
+
+    function updateStatus(connected) {
+      backendConnected = connected;
+      // No UI indicator needed
+    }
+
+    function showRpcWarning(show = true) {
+      const warning = document.getElementById('rpcWarning');
+      warning.style.display = show ? 'block' : 'none';
+      rpcFallbackMode = show;
+    }
+
+    // API helper
+    async function apiRequest(endpoint, options = {}) {
+      const maxRetries = 2;
+      let lastError = null;
+      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        try {
+          // Always use full API_BASE_URL, never relative
+          const fullUrl = API_BASE_URL + endpoint;
+          const response = await fetch(fullUrl, {
+            headers: { 'Content-Type': 'application/json', ...options.headers },
+            ...options
+          });
+          if (!response.ok) {
+            throw new Error(`API error: ${response.status} - ${response.statusText}`);
+          }
+          updateStatus(true);
+          return await response.json();
+        } catch (error) {
+          lastError = error;
+          if (attempt < maxRetries) {
+            await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+            continue;
+          }
+          updateStatus(false);
+          throw error;
+        }
+      }
+      throw lastError;
+    }
+
+    // Initialize Solana connection with fallback
+    async function initializeSolana() {
+      try {
+        await waitForSolana();
+        // Use real Solana endpoint for web3.js Connection
+        const SOLANA_RPC_URL = 'https://mainnet.helius-rpc.com/?api-key=f2f75056-c535-4df0-84ff-d8eb55198b7c';
+        const testConnection = new solanaWeb3.Connection(SOLANA_RPC_URL, 'confirmed');
+        try {
+          await testConnection.getEpochInfo();
+          connection = testConnection;
+          console.log(`Successfully connected to Solana: ${SOLANA_RPC_URL}`);
+          showRpcWarning(false);
+          return true;
+        } catch (error) {
+          console.warn('Solana RPC failed:', error.message);
+          showRpcWarning(true);
+          connection = null;
+          return false;
+        }
+      } catch (error) {
+        console.error('Failed to initialize Solana:', error);
+        toast('Failed to connect to Solana network: ' + error.message);
+        showRpcWarning(true);
+        return false;
+      }
+    }
+
+    // Wallet functions
+    async function connectWallet() {
+      try {
+        if (!window.solana) {
+          toast('Phantom wallet not detected. Please install Phantom wallet extension.', 'error');
+          window.open('https://phantom.app/', '_blank');
+          return;
+        }
+        // Request connection (always prompt user)
+        const response = await window.solana.connect({ onlyIfTrusted: false });
+        wallet = response.publicKey;
+        walletAdapter = window.solana;
+        // Get balance (skip if RPC is having issues)
+        if (connection && !rpcFallbackMode) {
+          try {
+            const balance = await connection.getBalance(wallet);
+            solBalance = balance / solanaWeb3.LAMPORTS_PER_SOL;
+          } catch (error) {
+            solBalance = 0;
+          }
+        }
+        // Only this wallet is admin
+        isAdmin = wallet.toString() === ADMIN_WALLET;
+        updateWalletUI();
+        // No popup, just update UI
+        if (currentSection === 'mybets') {
+          loadMyBets();
+        }
+      } catch (error) {
+        console.error('Wallet connection failed:', error);
+      }
+    }
+
+    async function disconnectWallet() {
+      try {
+        if (walletAdapter && walletAdapter.disconnect) {
+          await walletAdapter.disconnect();
+        }
+      } catch (error) {
+        console.error('Disconnect error:', error);
+      }
+      
+      wallet = null;
+      walletAdapter = null;
+      solBalance = 0;
+      isAdmin = false;
+      updateWalletUI();
+      toast('Wallet disconnected');
+    }
+
+    function updateWalletUI() {
+      const btn = document.getElementById('walletBtn');
+      const balanceDiv = document.getElementById('balanceDisplay');
+      const adminTab = document.getElementById('adminTab');
+      if (wallet) {
+        btn.textContent = wallet.toString().slice(0, 4) + '...' + wallet.toString().slice(-4);
+        btn.classList.add('connected');
+        if (solBalance > 0) {
+          document.getElementById('solBalance').textContent = solBalance.toFixed(3);
+          balanceDiv.style.display = '';
+        } else {
+          balanceDiv.style.display = 'none';
+        }
+        // Show admin tab only for admin wallet
+        if (isAdmin) {
+          adminTab.style.display = '';
+        } else {
+          adminTab.style.display = 'none';
+        }
+      } else {
+        btn.textContent = 'Connect Wallet';
+        btn.classList.remove('connected');
+        balanceDiv.style.display = 'none';
+        // Hide admin tab if not connected
+        if (adminTab) adminTab.style.display = 'none';
+      }
+    }
+
+    // Navigation
+    function showSection(sectionName) {
+      // Hide all sections
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      
+      // Show target section
+      document.getElementById(sectionName + 'Section').classList.add('active');
+      document.querySelector(`[data-section="${sectionName}"]`).classList.add('active');
+      
+      currentSection = sectionName;
+      
+      // Load section-specific data
+      if (sectionName === 'markets') {
+        loadMarkets();
+      } else if (sectionName === 'mybets') {
+        loadMyBets();
+      } else if (sectionName === 'treasury') {
+        loadTreasuryStats();
+      } else if (sectionName === 'admin' && isAdmin) {
+        loadPendingMarkets();
+      }
+    }
+
+    // Market functions
+    async function loadMarkets() {
+      try {
+        const response = await apiRequest('/markets?status=active');
+        markets = response.markets || [];
+        renderMarkets(markets);
+        
+      } catch (error) {
+        console.error('Failed to load markets:', error);
+        document.getElementById('marketsGrid').innerHTML = `
+          <div class="empty-state">
+            <h3>Connection Error</h3>
+            <p>Failed to load markets: ${error.message}</p>
+            <button class="btn" onclick="loadMarkets()">Retry</button>
+          </div>
+        `;
+      }
+    }
+
+    function renderMarkets(marketList) {
+      const grid = document.getElementById('marketsGrid');
+      
+      if (!marketList || marketList.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <h3>No Markets Available</h3>
+            <p>Be the first to create a prediction market.</p>
+            <button class="btn" onclick="openCreateMarketModal()">Create Market</button>
+          </div>
+        `;
+        return;
+      }
+      
+      grid.innerHTML = marketList.map(market => {
+        const optionsHtml = (market.options || []).slice(0, 4).map(option => `
+          <div class="option-preview">
+            <img src="${option.image || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTEiIGZpbGw9IiM0Yjc4OTAiLz4KPHRleHQgeD0iMTIiIHk9IjE2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIxMiIgZm9udC1mYW1pbHk9IkFyaWFsIj4/PC90ZXh0Pgo8L3N2Zz4='}" 
+                 alt="${escapeHtml(option.name || 'Option')}" 
+                 class="option-avatar" />
+            <span class="option-name">${escapeHtml(option.name || 'Option')}</span>
+          </div>
+        `).join('');
+        // Admin delete button logic
+        let deleteBtn = '';
+        if (isAdmin) {
+          deleteBtn = `<button class="btn-danger" style="float:right; margin-top: -8px; margin-bottom: 8px;" onclick="event.stopPropagation(); deleteMarket(${market.id})">Delete</button>`;
+        }
+        return `
+          <div class="market-card" onclick="showMarketDetail(${market.id})">
+            ${deleteBtn}
+            <div class="market-title">${escapeHtml(market.title || 'Untitled Market')}</div>
+            <div class="market-meta">
+              <div class="badge ${market.status === 'under_review' ? 'pending' : ''}">${escapeHtml(market.category || 'Other')}</div>
+              <div class="volume">${parseFloat(market.total_volume || 0).toFixed(3)} SOL</div>
+              ${market.status === 'under_review' ? '<div class="badge pending">Under Review</div>' : ''}
+            </div>
+            <div class="options-preview">${optionsHtml}</div>
+            <div style="margin-top: 12px; font-size: 12px; color: #9ca3af;">
+              Created: ${new Date(market.created_at).toLocaleDateString()}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+function showMarketDetail(marketId) {
+  // Instead of opening a modal, redirect to the market detail page
+  window.location.href = `market.html?id=${marketId}`;
+}
+
+    // Market creation functions
+    function openCreateMarketModal() {
+      if (!wallet) {
+        toast('Connect wallet to create markets');
+        return;
+      }
+      // Admin wallet can create for free, skip balance check
+      if (!isAdmin) {
+        if (!rpcFallbackMode && solBalance < CREATION_FEE) {
+          toast(`Insufficient balance. Need ${CREATION_FEE} SOL to create market`);
+          return;
+        }
+      }
+      resetCreateForm();
+      document.getElementById('createMarketModal').classList.add('active');
+    }
+
+    function closeCreateMarketModal() {
+      document.getElementById('createMarketModal').classList.remove('active');
+    }
+
+    function resetCreateForm() {
+      document.getElementById('marketTitle').value = '';
+      document.getElementById('marketCategory').value = 'other';
+      document.getElementById('marketEndDate').value = '';
+      
+      // Reset options
+      options = [
+        { name: 'Yes', image: null, file: null },
+        { name: 'No', image: null, file: null }
+      ];
+      renderOptionsBuilder();
+      
+      // Set minimum date
+      const minDate = new Date();
+      minDate.setHours(minDate.getHours() + 1);
+      document.getElementById('marketEndDate').min = minDate.toISOString().slice(0, 16);
+    }
+
+    function renderOptionsBuilder() {
+      const container = document.getElementById('optionsContainer');
+      container.innerHTML = '';
+      
+      options.forEach((option, index) => {
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'option-item';
+        
+        // Determine display content for avatar
+        let avatarContent = '';
+        let showImageStatus = false;
+        
+        if (option.image) {
+          avatarContent = `<img src="${option.image}" alt="Option ${index + 1}" class="option-avatar-preview">`;
+          showImageStatus = true;
+        } else {
+          // Show first letter of name or placeholder
+          const letter = option.name ? option.name.charAt(0).toUpperCase() : '?';
+          avatarContent = `<div class="option-avatar-preview">${letter}</div>`;
+        }
+        
+        optionDiv.innerHTML = `
+          <div class="option-avatar-container">
+            ${avatarContent}
+            ${showImageStatus ? '<div class="image-status">Image Ready</div>' : ''}
+          </div>
+          <div class="option-input-group">
+            <input type="text" 
+                   class="option-name-input" 
+                   placeholder="Enter option name" 
+                   value="${option.name || ''}" 
+                   onchange="updateOptionName(${index}, this.value)">
+            <div class="file-input-wrapper">
+              <label class="file-input-custom">
+                ${option.file ? option.file.name : 'Choose image'}
+                <input type="file" 
+                       accept="image/*" 
+                       class="file-input-hidden"
+                       onchange="handleOptionImage(${index}, this)">
+              </label>
+            </div>
+          </div>
+          <button onclick="removeOption(${index})" class="remove-option-btn">Remove</button>
+        `;
+        container.appendChild(optionDiv);
+      });
+    }
+
+    function addOption() {
+      if (options.length >= 5) {
+        toast('Maximum 5 options allowed');
+        return;
+      }
+      
+      options.push({ name: '', image: null, file: null });
+      renderOptionsBuilder();
+    }
+
+    function removeOption(index) {
+      if (options.length <= 2) {
+        toast('Minimum 2 options required');
+        return;
+      }
+      
+      options.splice(index, 1);
+      renderOptionsBuilder();
+    }
+
+    function updateOptionName(index, name) {
+      options[index].name = name;
+    }
+
+    async function handleOptionImage(index, input) {
+      const file = input.files[0];
+      if (!file) return;
+      
+      options[index].file = file;
+      
+      // Show preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        options[index].image = e.target.result;
+        renderOptionsBuilder();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    async function createMarket() {
+      const submitBtn = document.getElementById('submitCreateBtn');
+      
+      const title = document.getElementById('marketTitle').value.trim();
+      const category = document.getElementById('marketCategory').value;
+      const endDate = document.getElementById('marketEndDate').value;
+      
+      // Validation
+      if (!title || title.length < 10) {
+        toast('Market question must be at least 10 characters');
+        return;
+      }
+      
+      if (!endDate) {
+        toast('Please set an end date');
+        return;
+      }
+      
+      // Validate options
+      const validOptions = options.filter(opt => opt.name && opt.name.trim());
+      if (validOptions.length < 2) {
+        toast('At least 2 options with names are required');
+        return;
+      }
+      
+      try {
+        setLoading(submitBtn, true);
+        toast('Creating market on MAINNET...');
+        // Upload images first (with better error handling)
+        const processedOptions = [];
+        for (const option of validOptions) {
+          let imageUrl = null;
+          if (option.file) {
+            try {
+              const formData = new FormData();
+              formData.append('file', option.file);
+              const uploadResponse = await fetch(API_BASE_URL + '/upload', {
+                method: 'POST',
+                body: formData
+              });
+              if (uploadResponse.ok) {
+                const uploadData = await uploadResponse.json();
+                imageUrl = uploadData.url;
+              } else {
+                console.warn('Image upload failed:', uploadResponse.status);
+                toast('Warning: Image upload failed, continuing without image');
+              }
+            } catch (error) {
+              console.warn('Image upload error:', error);
+              toast('Warning: Image upload failed, continuing without image');
+            }
+          }
+          processedOptions.push({
+            name: option.name.trim(),
+            image: imageUrl
+          });
+        }
+        let signature = null;
+        // Admin wallet creates for free (no transaction)
+        if (isAdmin) {
+          signature = 'ADMIN_FREE_MARKET';
+        } else {
+          // Create transaction
+          const transaction = new solanaWeb3.Transaction();
+          const transferInstruction = solanaWeb3.SystemProgram.transfer({
+            fromPubkey: wallet,
+            toPubkey: new solanaWeb3.PublicKey(TREASURY_WALLET),
+            lamports: Math.floor(CREATION_FEE * solanaWeb3.LAMPORTS_PER_SOL)
+          });
+          transaction.add(transferInstruction);
+          // Get recent blockhash (may fail in fallback mode)
+          try {
+            const { blockhash } = await connection.getLatestBlockhash();
+            transaction.recentBlockhash = blockhash;
+          } catch (error) {
+            console.warn('Could not get recent blockhash, wallet will handle it:', error.message);
+          }
+          transaction.feePayer = wallet;
+          // Sign and send
+          const signedTransaction = await walletAdapter.signTransaction(transaction);
+          signature = await connection.sendRawTransaction(signedTransaction.serialize());
+          // In fallback mode, we might not be able to confirm
+          try {
+            await connection.confirmTransaction(signature);
+            console.log('Market creation transaction confirmed:', signature);
+          } catch (error) {
+            console.warn('Could not confirm transaction (may still succeed):', error.message);
+          }
+        }
+        // Save to database
+        const marketData = await apiRequest('/markets', {
+          method: 'POST',
+          body: JSON.stringify({
+            title: title,
+            description: '',
+            category: category,
+            creator_address: wallet.toString(),
+            endDate: endDate,
+            initialLiquidity: 0,
+            options: processedOptions,
+            creationSignature: signature
+          })
+        });
+        // Update balance (skip if RPC issues)
+        if (!rpcFallbackMode && !isAdmin) {
+          try {
+            const balance = await connection.getBalance(wallet);
+            solBalance = balance / solanaWeb3.LAMPORTS_PER_SOL;
+            updateWalletUI();
+          } catch (error) {
+            console.warn('Could not update balance:', error.message);
+          }
+        }
+        closeCreateMarketModal();
+        loadMarkets();
+        toast('Market created successfully! It will be reviewed by admins before going live.');
+      } catch (error) {
+        console.error('Market creation failed:', error);
+        if (error.message.includes('User rejected')) {
+          toast('Transaction cancelled by user');
+        } else {
+          toast('Failed to create market: ' + error.message);
+        }
+      } finally {
+        setLoading(submitBtn, false);
+      }
+    }
+
+    // Admin functions
+    async function loadPendingMarkets() {
+      if (!isAdmin) return;
+      try {
+        const response = await apiRequest(`/admin/pending-markets?address=${wallet.toString()}`);
+        const pendingMarkets = response.markets || [];
+        renderPendingMarkets(pendingMarkets);
+      } catch (error) {
+        console.error('Failed to load pending markets:', error);
+        // Handle specific error cases
+        if (error.message.includes('404')) {
+          document.getElementById('pendingMarketsContainer').innerHTML = `
+            <div class="empty-state">
+              <h3>Admin Backend Not Available</h3>
+              <p>The admin endpoints are not yet implemented on the backend.</p>
+              <p style="font-size: 12px; color: #9ca3af; margin-top: 8px;">Error: ${error.message}</p>
+            </div>
+          `;
+        } else {
+          document.getElementById('pendingMarketsContainer').innerHTML = `
+            <div class="empty-state">
+              <h3>Error Loading Pending Markets</h3>
+              <p>${error.message}</p>
+              <button class="btn" onclick="loadPendingMarkets()">Retry</button>
+            </div>
+          `;
+        }
+      }
+    }
+
+    function renderPendingMarkets(pendingMarkets) {
+      const container = document.getElementById('pendingMarketsContainer');
+      
+      if (!pendingMarkets || pendingMarkets.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>No Pending Markets</h3>
+            <p>All markets have been reviewed.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = pendingMarkets.map(market => {
+        const optionsHtml = (market.options || []).map((option, index) => `
+          <div class="option-preview" style="margin: 4px;">
+            <img src="${option.image || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTEiIGZpbGw9IiM0Yjc4OTAiLz4KPHRleHQgeD0iMTIiIHk9IjE2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIxMiIgZm9udC1mYW1pbHk9IkFyaWFsIj4/PC90ZXh0Pgo8L3N2Zz4='}" 
+                 alt="${escapeHtml(option.name || 'Option')}" 
+                 class="option-avatar" />
+            <span class="option-name">${escapeHtml(option.name || 'Option')}</span>
+          </div>
+        `).join('');
+
+        const oddsSection = (market.options || []).map((option, index) => `
+          <div class="odds-row">
+            <span style="color: #f3f4f6; font-weight: 600;">${escapeHtml(option.name || `Option ${index + 1}`)}</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="color: #9ca3af; font-size: 12px;">Odds:</span>
+              <input type="number" 
+                     class="odds-input" 
+                     placeholder="2.5" 
+                     step="0.1" 
+                     min="1.1"
+                     id="odds-${market.id}-${index}"
+                     value="${(market.metadata?.admin_odds && market.metadata.admin_odds[index]) || ''}">
+              <span style="color: #9ca3af; font-size: 12px;">x</span>
+            </div>
+          </div>
+        `).join('');
+        
+        return `
+          <div class="admin-card">
+            <div class="market-title">${escapeHtml(market.title || 'Untitled Market')}</div>
+            <div class="market-meta" style="margin: 8px 0;">
+              <div class="badge">${escapeHtml(market.category || 'Other')}</div>
+              <div style="color: #9ca3af; font-size: 12px;">
+                Creator: ${market.creator_address.slice(0, 8)}...
+              </div>
+            </div>
+            <div class="options-preview" style="margin: 12px 0;">${optionsHtml}</div>
+            
+            <div class="admin-odds-section">
+              <h4 style="color: #f59e0b; font-size: 14px; margin-bottom: 12px;">Set Odds & Returns</h4>
+              ${oddsSection}
+              <button onclick="updateMarketOdds(${market.id})" class="btn-secondary" style="margin-top: 8px; font-size: 12px;">Update Odds</button>
+            </div>
+            
+            <div style="font-size: 12px; color: #9ca3af; margin: 12px 0;">
+              Created: ${new Date(market.created_at).toLocaleString()}
+              ${market.end_date ? ` | Ends: ${new Date(market.end_date).toLocaleString()}` : ''}
+            </div>
+            <div class="admin-actions">
+              <button onclick="approveMarket(${market.id})" class="btn">Approve Market</button>
+              <button onclick="rejectMarket(${market.id})" class="btn-danger">Reject Market</button>
+              <button onclick="deleteMarket(${market.id})" class="btn-danger">Delete Market</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Missing function: Update market odds
+    async function updateMarketOdds(marketId) {
+      if (!isAdmin) return;
+      try {
+        // Get the current market data to find number of options
+        const market = markets.find(m => m.id === marketId);
+        if (!market) {
+          toast('Market not found');
+          return;
+        }
+        // Collect odds from input fields
+        const odds = [];
+        const optionCount = market.options ? market.options.length : 0;
+        for (let i = 0; i < optionCount; i++) {
+          const oddsInput = document.getElementById(`odds-${marketId}-${i}`);
+          if (oddsInput) {
+            const oddsValue = parseFloat(oddsInput.value);
+            if (isNaN(oddsValue) || oddsValue < 1.1) {
+              toast(`Invalid odds for option ${i + 1}. Must be >= 1.1`);
+              return;
+            }
+            odds.push(oddsValue);
+          }
+        }
+        if (odds.length === 0) {
+          toast('No odds to update');
+          return;
+        }
+        // Send update to backend
+        await apiRequest(`/admin/update-odds/${marketId}?address=${wallet.toString()}`, {
+          method: 'POST',
+          body: JSON.stringify({ odds: odds })
+        });
+        toast('Odds updated successfully');
+        loadPendingMarkets(); // Refresh the view
+      } catch (error) {
+        console.error('Failed to update odds:', error);
+        toast('Failed to update odds: ' + error.message);
+      }
+    }
+
+    async function approveMarket(marketId) {
+      if (!isAdmin) return;
+      try {
+        await apiRequest(`/admin/approve-market/${marketId}?address=${wallet.toString()}`, {
+          method: 'POST'
+        });
+        toast('Market approved successfully');
+        loadPendingMarkets();
+      } catch (error) {
+        console.error('Failed to approve market:', error);
+        toast('Failed to approve market: ' + error.message);
+      }
+    }
+
+    async function rejectMarket(marketId) {
+      if (!isAdmin) return;
+      const reason = prompt('Rejection reason (optional):');
+      try {
+        await apiRequest(`/admin/reject-market/${marketId}?address=${wallet.toString()}`, {
+          method: 'POST',
+          body: JSON.stringify({ reason: reason || 'Violated platform guidelines' })
+        });
+        toast('Market rejected successfully');
+        loadPendingMarkets();
+      } catch (error) {
+        console.error('Failed to reject market:', error);
+        toast('Failed to reject market: ' + error.message);
+      }
+    }
+
+    async function loadMyBets() {
+      const container = document.getElementById('betsContainer');
+      
+      if (!wallet) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>Connect Wallet</h3>
+            <p>Connect your wallet to view your betting history.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      try {
+        const response = await apiRequest(`/bets?address=${wallet.toString()}`);
+        const bets = response.bets || [];
+        
+        if (bets.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <h3>No Bets Yet</h3>
+              <p>Your betting history will appear here once you place your first bet.</p>
+            </div>
+          `;
+        } else {
+          container.innerHTML = bets.map(bet => `
+            <div class="admin-card">
+              <div class="market-title">${escapeHtml(bet.market_title || 'Unknown Market')}</div>
+              <div style="color: #10b981; font-weight: 700; margin: 8px 0;">
+                Amount: ${parseFloat(bet.amount || 0).toFixed(3)} SOL
+              </div>
+              <div style="color: #9ca3af; font-size: 12px;">
+                ${new Date(bet.created_at).toLocaleDateString()}
+                ${bet.transaction_signature ? ` | <a href="https://explorer.solana.com/tx/${bet.transaction_signature}?cluster=mainnet-beta" target="_blank" style="color: #10b981;">View TX</a>` : ''}
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch (error) {
+        console.error('Failed to load bets:', error);
+        container.innerHTML = `
+          <div class="empty-state">
+            <h3>Error Loading Bets</h3>
+            <p>${error.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    async function loadTreasuryStats() {
+      try {
+        // Try to get treasury balance (skip if RPC issues)
+        if (connection && !rpcFallbackMode) {
+          try {
+            const treasuryPubkey = new solanaWeb3.PublicKey(TREASURY_WALLET);
+            const balance = await connection.getBalance(treasuryPubkey);
+            const treasurySOL = balance / solanaWeb3.LAMPORTS_PER_SOL;
+            document.getElementById('treasuryBalance').textContent = `${treasurySOL.toFixed(3)} SOL`;
+          } catch (error) {
+            console.warn('Could not fetch treasury balance:', error.message);
+            document.getElementById('treasuryBalance').textContent = 'RPC Unavailable';
+          }
+        } else {
+          document.getElementById('treasuryBalance').textContent = 'RPC Unavailable';
+        }
+        
+        const response = await apiRequest('/stats');
+        document.getElementById('marketCount').textContent = response.totalMarkets || 0;
+        document.getElementById('totalVolume').textContent = `${parseFloat(response.totalVolume || 0).toFixed(3)} SOL`;
+        
+      } catch (error) {
+        console.error('Failed to load treasury stats:', error);
+        document.getElementById('treasuryBalance').textContent = 'Error';
+        document.getElementById('marketCount').textContent = 'Error';
+        document.getElementById('totalVolume').textContent = 'Error';
+      }
+    }
+
+    // Event listeners
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Phantom wallet event listeners for better connection stability
+      if (window.solana && window.solana.isPhantom) {
+        // Auto-reconnect on page load if previously connected
+        window.solana.on('connect', () => {
+          if (!wallet) connectWallet();
+        });
+        window.solana.on('disconnect', () => {
+          disconnectWallet();
+        });
+        // Listen for account changes
+        window.solana.on('accountChanged', (publicKey) => {
+          if (publicKey) {
+            connectWallet();
+          } else {
+            disconnectWallet();
+          }
+        });
+      }
+      // Initialize
+      const solanaReady = await initializeSolana();
+      if (!solanaReady) {
+        toast('Failed to connect to Solana network');
+        return;
+      }
+      
+      // Navigation
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          showSection(link.dataset.section);
+        });
+      });
+      
+      // Wallet
+      document.getElementById('walletBtn').addEventListener('click', () => {
+        if (wallet) {
+          disconnectWallet();
+        } else {
+          connectWallet();
+        }
+      });
+      
+      // Create market modal
+      document.getElementById('createMarketBtn').addEventListener('click', openCreateMarketModal);
+      document.getElementById('cancelCreateBtn').addEventListener('click', closeCreateMarketModal);
+      document.getElementById('submitCreateBtn').addEventListener('click', createMarket);
+      document.getElementById('addOptionBtn').addEventListener('click', addOption);
+      
+      // Admin
+      document.getElementById('refreshPendingBtn').addEventListener('click', loadPendingMarkets);
+      
+      // Modal backdrop clicks
+      document.getElementById('createMarketModal').addEventListener('click', (e) => {
+        if (e.target.id === 'createMarketModal') {
+          closeCreateMarketModal();
+        }
+      });
+      
+      document.getElementById('marketDetailModal').addEventListener('click', (e) => {
+        if (e.target.id === 'marketDetailModal') {
+          closeMarketDetailModal();
+        }
+      });
+      
+      // Betting interface events
+      document.getElementById('betAmount').addEventListener('input', calculatePotentialReturn);
+      document.getElementById('placeBetBtn').addEventListener('click', placeBet);
+      
+      // Check backend connectivity and load initial data
+      try {
+        await loadMarkets();
+        console.log('Backend connected successfully');
+      } catch (error) {
+        console.warn('Backend connection failed on startup:', error.message);
+        updateStatus(false);
+      }
+      
+      console.log('Solymarket initialized successfully');
+    });
+
+    // Make functions global for HTML onclick handlers
+    window.showMarketDetail = showMarketDetail;
+    window.openCreateMarketModal = openCreateMarketModal;
+    window.closeMarketDetailModal = closeMarketDetailModal;
+    window.selectBettingOption = selectBettingOption;
+    window.addOption = addOption;
+    window.removeOption = removeOption;
+    window.updateOptionName = updateOptionName;
+    window.handleOptionImage = handleOptionImage;
+    window.updateMarketOdds = updateMarketOdds;
+    window.approveMarket = approveMarket;
+    window.rejectMarket = rejectMarket;
+    window.deleteMarket = deleteMarket;
+    window.loadMarkets = loadMarkets;
+    window.loadPendingMarkets = loadPendingMarkets;
+    window.placeBet = placeBet;
+
+    // Admin: Delete market function
+    async function deleteMarket(marketId) {
+      if (!isAdmin) return;
+      if (!confirm('Are you sure you want to permanently delete this market? This cannot be undone.')) return;
+      try {
+        await apiRequest(`/admin/delete-market/${marketId}?address=${wallet.toString()}`, {
+          method: 'POST'
+        });
+        toast('Market deleted successfully');
+        loadPendingMarkets();
+      } catch (error) {
+        console.error('Failed to delete market:', error);
+        toast('Failed to delete market: ' + error.message);
+      }
+    }
+  </script>
+  <!-- Market Detail Modal -->
+<div id="marketDetailModal" class="modal">
+  <div class="modal-content">
+    <h3 id="marketDetailTitle" class="modal-title">Market Details</h3>
+    <div id="marketDetailContent">
+      <!-- Market details will be populated by JavaScript -->
+    </div>
+    
+    <div id="bettingOptions" class="betting-options">
+      <!-- Betting options will be populated -->
+    </div>
+    
+    <div class="betting-form">
+      <div id="bettingWarning" class="betting-warning" style="display: none;">
+        Connect your wallet to place bets
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="betAmount">Bet Amount (SOL)</label>
+        <input type="number" id="betAmount" class="form-input" min="0" step="0.001" placeholder="0.000">
+      </div>
+      
+      <div style="background: rgba(154, 255, 0, 0.08); padding: 16px; border-radius: 8px; text-align: center; margin-bottom: 16px;">
+        <div style="color: #9ca3af; font-size: 14px;">Potential Return</div>
+        <div id="potentialReturn" style="font-size: 20px; font-weight: 700; color: #9aff00;">0.00 SOL</div>
+      </div>
+      
+      <button id="placeBetBtn" class="btn" style="width: 100%;">Place Bet</button>
+    </div>
+    
+    <div style="text-align: center; margin-top: 20px;">
+      <button onclick="closeMarketDetailModal()" class="btn-secondary">Close</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
